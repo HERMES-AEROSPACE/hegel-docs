@@ -1,0 +1,791 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Integration &mdash; HEGEL 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script>window.MathJax = {"tex": {"macros": {"RR": "\\mathbb{R}", "vect": ["\\mathbf{#1}", 1], "pd": ["\\frac{\\partial #1}{\\partial #2}", 2]}}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Spatial Discretization" href="spatial_discretization.html" />
+    <link rel="prev" title="Flux Schemes" href="flux_schemes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            HEGEL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#required-packages">Required Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#building-petsc">Building PETSc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#building-hegel-with-autotools">Building HEGEL with Autotools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-1-bootstrap">Step 1: Bootstrap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-2-configure">Step 2: Configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-3-build-and-install">Step 3: Build and Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-4-environment-setup">Step 4: Environment Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#running-a-case">Running a Case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#running-hegel">Running HEGEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#available-test-cases">Available Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#configure-options-for-fluid-models">Configure Options for Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#optional-library-integration">Optional Library Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#typical-simulation-workflow">Typical Simulation Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#output-formats">Output Formats</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory &amp; Physics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#design-philosophy">Design Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#fluid-models">Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#multi-physics-coupling">Multi-Physics Coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#demonstrated-applications">Demonstrated Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../physics.html">Physics and Numerical Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#governing-equations">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#space-discretization">Space Discretization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#inviscid-flux">Inviscid Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#diffusive-flux">Diffusive Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#time-integration">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#grid-system">Grid System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#solution-strategy-for-steady-state-problems">Solution Strategy for Steady-State Problems</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Numerical Schemes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Numerical Schemes</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#quick-reference">Quick Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="flux_schemes.html">Flux Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#availability-matrix">Availability Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#ausm-family">AUSM Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#roe-family">Roe Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#van-leer-flux-vector-splitting">Van Leer Flux-Vector Splitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#hlle">HLLE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#steger-warming">Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#modified-steger-warming">Modified Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#lax-friedrichs">Lax-Friedrichs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#central-and-hybrid-schemes">Central and Hybrid Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#flux-jacobian-approximations">Flux Jacobian Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Time Integration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#explicit-methods">Explicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implicit-methods">Implicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run-modes-and-cfl-control">Run Modes and CFL Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#petsc-linear-solver-options">PETSc Linear Solver Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_discretization.html">Spatial Discretization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-procedures">Reconstruction Procedures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-variable-sets">Reconstruction Variable Sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#slope-limiters">Slope Limiters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-availability-by-model">Reconstruction Availability by Model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="boundary_conditions.html">Boundary Conditions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#inviscid-euler-boundary-conditions">Inviscid (Euler) Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#subsonic-inlet-outlet">Subsonic Inlet / Outlet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#viscous-navier-stokes-wall-conditions">Viscous (Navier-Stokes) Wall Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#lodi-non-reflecting-boundary-conditions">LODI Non-Reflecting Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#internal-boundaries">Internal Boundaries</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_terms.html">Source Terms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#geometric-source-terms">Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#viscous-geometric-source-terms">Viscous Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#chemical-kinetics-source-terms">Chemical Kinetics Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#electromagnetic-source-terms">Electromagnetic Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#radiation-source-terms">Radiation Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#verification-source-terms">Verification Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#sponge-layers">Sponge Layers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="preconditioning.html">Preconditioning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#available-preconditioners">Available Preconditioners</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#weiss-smith-preconditioning">Weiss-Smith Preconditioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#input-settings">Input Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#compatibility">Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#grid-adaptation">Grid Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_reference.html">Input Parameter Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#fluid-model-selection">Fluid Model Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#numerical-flux">Numerical Flux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#reconstruction">Reconstruction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#time-integration">Time Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#linear-solver-petsc-ksp">Linear Solver (PETSc KSP)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#source-terms">Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#grid-adaptation">Grid Adaptation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#complete-input-file-example">Complete Input File Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Software Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#main-class-structure">Main Class Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#source-directory-structure">Source Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#multi-block-parallelization">Multi-Block Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#coupling-architecture">Coupling Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#build-system">Build System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#ci-cd">CI/CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_fortran.html">Fortran API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_fortran.html#key-modules">Key Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_doxygen.html">Doxygen API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_doxygen.html#source-files">Source Files</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HEGEL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Numerical Schemes</a></li>
+      <li class="breadcrumb-item active">Time Integration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/numerical_schemes/time_integration.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="time-integration">
+<span id="id1"></span><h1>Time Integration<a class="headerlink" href="#time-integration" title="Link to this heading"></a></h1>
+<p>HEGEL provides explicit, implicit, and operator-splitting time integrators.
+The integrator is selected via the <code class="docutils literal notranslate"><span class="pre">NUM_TIME_INT</span></code> keyword. Implicit methods
+additionally require <code class="docutils literal notranslate"><span class="pre">NUM_LHS_JAC</span></code> to specify the Jacobian approximation.</p>
+<nav class="contents local" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#summary" id="id2">Summary</a></p></li>
+<li><p><a class="reference internal" href="#explicit-methods" id="id3">Explicit Methods</a></p>
+<ul>
+<li><p><a class="reference internal" href="#forward-euler" id="id4">Forward Euler</a></p></li>
+<li><p><a class="reference internal" href="#classical-runge-kutta-rk2-rk4" id="id5">Classical Runge-Kutta (RK2, RK4)</a></p></li>
+<li><p><a class="reference internal" href="#ssp-runge-kutta-tvd" id="id6">SSP Runge-Kutta (TVD)</a></p></li>
+<li><p><a class="reference internal" href="#low-storage-runge-kutta" id="id7">Low-Storage Runge-Kutta</a></p></li>
+<li><p><a class="reference internal" href="#low-storage-rk-point-implicit" id="id8">Low-Storage RK (Point-Implicit)</a></p></li>
+<li><p><a class="reference internal" href="#strang-splitting" id="id9">Strang Splitting</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#implicit-methods" id="id10">Implicit Methods</a></p>
+<ul>
+<li><p><a class="reference internal" href="#backward-euler" id="id11">Backward Euler</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#dual-time-stepping" id="id12">Dual-Time Stepping</a></p>
+<ul>
+<li><p><a class="reference internal" href="#three-point-backward-bdf2" id="id13">Three-Point Backward (BDF2)</a></p></li>
+<li><p><a class="reference internal" href="#crank-nicolson" id="id14">Crank-Nicolson</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#run-modes-and-cfl-control" id="id15">Run Modes and CFL Control</a></p></li>
+<li><p><a class="reference internal" href="#petsc-linear-solver-options" id="id16">PETSc Linear Solver Options</a></p></li>
+</ul>
+</nav>
+<section id="summary">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Summary</a><a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12.0%" />
+<col style="width: 25.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 33.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Class</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Order</p></th>
+<th class="head"><p>Dual-Time</p></th>
+<th class="head"><p>LHS Approximation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">forward_Euler</span></code></p></td>
+<td><p>Explicit</p></td>
+<td><p>1</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RK2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Runge_Kutta</span></code></p></td>
+<td><p>Explicit</p></td>
+<td><p>2</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RK4</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Runge_Kutta</span></code></p></td>
+<td><p>Explicit</p></td>
+<td><p>4</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RK_LS</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Runge_Kutta_ls</span></code></p></td>
+<td><p>Explicit</p></td>
+<td><p>varies</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RK_LS_PI</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Runge_Kutta_ls_pi</span></code></p></td>
+<td><p>Semi-impl.</p></td>
+<td><p>varies</p></td>
+<td><p>–</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DIAG</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RK2_SSP</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Runge_Kutta_ssp</span></code></p></td>
+<td><p>Explicit</p></td>
+<td><p>2</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RK3_SSP</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Runge_Kutta_ssp</span></code></p></td>
+<td><p>Explicit</p></td>
+<td><p>3</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RK2_TVD</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Runge_Kutta_ssp</span></code></p></td>
+<td><p>Explicit</p></td>
+<td><p>2</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RK3_TVD</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Runge_Kutta_ssp</span></code></p></td>
+<td><p>Explicit</p></td>
+<td><p>3</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">STRANG</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Strang_splitting</span></code></p></td>
+<td><p>Splitting</p></td>
+<td><p>2</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">OS</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Strang_splitting</span></code></p></td>
+<td><p>Splitting</p></td>
+<td><p>2</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">backward_Euler*</span></code></p></td>
+<td><p>Implicit</p></td>
+<td><p>1</p></td>
+<td><p>Optional</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FULL</span></code>, <code class="docutils literal notranslate"><span class="pre">DIAG</span></code>, <code class="docutils literal notranslate"><span class="pre">DPLR</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">3PB</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">three_point_backward*</span></code></p></td>
+<td><p>Implicit</p></td>
+<td><p>2</p></td>
+<td><p>Required</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FULL</span></code>, <code class="docutils literal notranslate"><span class="pre">DIAG</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CN</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">crank_nicolson_dt</span></code></p></td>
+<td><p>Implicit</p></td>
+<td><p>2</p></td>
+<td><p>Required</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FULL</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source directory:</strong> <code class="docutils literal notranslate"><span class="pre">src/time_integrator/</span></code></p>
+<p><strong>Data constants:</strong> <code class="docutils literal notranslate"><span class="pre">src/data/data_time_int.F90</span></code></p>
+</section>
+<section id="explicit-methods">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Explicit Methods</a><a class="headerlink" href="#explicit-methods" title="Link to this heading"></a></h2>
+<section id="forward-euler">
+<span id="ti-fe"></span><h3><a class="toc-backref" href="#id4" role="doc-backlink">Forward Euler</a><a class="headerlink" href="#forward-euler" title="Link to this heading"></a></h3>
+<p>First-order explicit method:</p>
+<div class="math notranslate nohighlight">
+\[U^{n+1} = U^n + \Delta t \, R(U^n)\]</div>
+<p>where <span class="math notranslate nohighlight">\(R(U)\)</span> is the spatial residual (RHS).</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = FE
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">class_fe.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">fe.F90</span></code></p>
+</section>
+<section id="classical-runge-kutta-rk2-rk4">
+<span id="ti-rk"></span><h3><a class="toc-backref" href="#id5" role="doc-backlink">Classical Runge-Kutta (RK2, RK4)</a><a class="headerlink" href="#classical-runge-kutta-rk2-rk4" title="Link to this heading"></a></h3>
+<p>Standard multi-stage Runge-Kutta methods using the Butcher tableau
+representation. RK2 is the midpoint method; RK4 is the classical 4-stage
+method.</p>
+<p><strong>RK4 Butcher tableau:</strong></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{c|cccc}
+0 &amp; &amp; &amp; &amp; \\
+1/2 &amp; 1/2 &amp; &amp; &amp; \\
+1/2 &amp; 0 &amp; 1/2 &amp; &amp; \\
+1 &amp; 0 &amp; 0 &amp; 1 &amp; \\
+\hline
+&amp; 1/6 &amp; 1/3 &amp; 1/3 &amp; 1/6
+\end{array}\end{split}\]</div>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = RK4   # or RK2
+NUM_RUN_MODE = CONSTANT_CFL
+NUM_CFL      = 0.5
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">class_rk.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">rk.F90</span></code></p>
+</section>
+<section id="ssp-runge-kutta-tvd">
+<span id="ti-rk-ssp"></span><h3><a class="toc-backref" href="#id6" role="doc-backlink">SSP Runge-Kutta (TVD)</a><a class="headerlink" href="#ssp-runge-kutta-tvd" title="Link to this heading"></a></h3>
+<p>Strong Stability Preserving (SSP) variants that maintain the Total Variation
+Diminishing (TVD) property of the spatial discretization. Essential when using
+limiters near discontinuities.</p>
+<p><strong>SSP-RK3 (Shu-Osher form):</strong></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}U^{(1)} &amp;= U^n + \Delta t \, R(U^n) \\
+U^{(2)} &amp;= \tfrac{3}{4} U^n + \tfrac{1}{4} U^{(1)}
+           + \tfrac{1}{4} \Delta t \, R(U^{(1)}) \\
+U^{n+1} &amp;= \tfrac{1}{3} U^n + \tfrac{2}{3} U^{(2)}
+           + \tfrac{2}{3} \Delta t \, R(U^{(2)})\end{split}\]</div>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = RK3_SSP   # or RK2_SSP, RK2_TVD, RK3_TVD
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">class_rk_ssp.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">rk_ssp.F90</span></code></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">RK2_TVD</span></code> and <code class="docutils literal notranslate"><span class="pre">RK2_SSP</span></code> are identical; likewise <code class="docutils literal notranslate"><span class="pre">RK3_TVD</span></code> and <code class="docutils literal notranslate"><span class="pre">RK3_SSP</span></code>.</p>
+</div>
+</section>
+<section id="low-storage-runge-kutta">
+<span id="ti-rk-ls"></span><h3><a class="toc-backref" href="#id7" role="doc-backlink">Low-Storage Runge-Kutta</a><a class="headerlink" href="#low-storage-runge-kutta" title="Link to this heading"></a></h3>
+<p>Memory-efficient RK variants using the 2N-storage formulation. Only two
+solution-sized arrays are needed regardless of the number of stages.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = RK_LS
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">class_rk_ls.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">rk_ls.F90</span></code></p>
+</section>
+<section id="low-storage-rk-point-implicit">
+<span id="ti-rk-ls-pi"></span><h3><a class="toc-backref" href="#id8" role="doc-backlink">Low-Storage RK (Point-Implicit)</a><a class="headerlink" href="#low-storage-rk-point-implicit" title="Link to this heading"></a></h3>
+<p>Low-storage RK with point-implicit treatment of the source term diagonal.
+Improves stability for stiff source terms without the cost of a full implicit
+solve.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = RK_LS_PI
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">class_rk_ls_pi.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">rk_ls_pi.F90</span></code></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Not available when sponge zones are present.</p>
+</div>
+</section>
+<section id="strang-splitting">
+<span id="ti-strang"></span><h3><a class="toc-backref" href="#id9" role="doc-backlink">Strang Splitting</a><a class="headerlink" href="#strang-splitting" title="Link to this heading"></a></h3>
+<p>Second-order operator splitting that separates the convective (flux) operator
+from the stiff source (chemistry/relaxation) operator:</p>
+<div class="math notranslate nohighlight">
+\[U^{n+1} = S_{\Delta t/2} \circ F_{\Delta t} \circ S_{\Delta t/2} \, U^n\]</div>
+<p>The source operator <span class="math notranslate nohighlight">\(S\)</span> uses an external ODE integrator (CVODE/LSODE
+via SUNDIALS) to handle chemical stiffness. Default ODE tolerances:
+<code class="docutils literal notranslate"><span class="pre">rtol</span> <span class="pre">=</span> <span class="pre">1e-6</span></code>, <code class="docutils literal notranslate"><span class="pre">atol</span> <span class="pre">=</span> <span class="pre">1e-9</span></code>.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = STRANG   # or OS
+NUM_RUN_MODE = CONSTANT_DT
+NUM_DT       = 1.0e-8
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">class_Strang.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">Strang.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">Strang_flux.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">Strang_source.F90</span></code></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Requires constant time-step mode (<code class="docutils literal notranslate"><span class="pre">CONSTANT_DT</span></code>). Requires SUNDIALS
+at compile time (<code class="docutils literal notranslate"><span class="pre">--with-sundials</span></code>).</p>
+</div>
+</section>
+</section>
+<section id="implicit-methods">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Implicit Methods</a><a class="headerlink" href="#implicit-methods" title="Link to this heading"></a></h2>
+<p>Implicit methods solve a linear system at each time step. The structure of
+the left-hand side (LHS) matrix is controlled by <code class="docutils literal notranslate"><span class="pre">NUM_LHS_JAC</span></code>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 30.0%" />
+<col style="width: 55.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Approximation</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FULL</span></code></p></td>
+<td><p>Full sparse Jacobian</p></td>
+<td><p>Solved by PETSc GMRES. Most accurate but most expensive.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DIAG</span></code></p></td>
+<td><p>Block-diagonal (point-implicit)</p></td>
+<td><p>Each cell inverted independently. Fast, low memory.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DPLR</span></code></p></td>
+<td><p>Data-Parallel Line Relaxation</p></td>
+<td><p>Tridiagonal block solves along grid lines. Good balance of accuracy/cost.</p></td>
+</tr>
+</tbody>
+</table>
+<section id="backward-euler">
+<span id="ti-be"></span><h3><a class="toc-backref" href="#id11" role="doc-backlink">Backward Euler</a><a class="headerlink" href="#backward-euler" title="Link to this heading"></a></h3>
+<p>First-order implicit:</p>
+<div class="math notranslate nohighlight">
+\[\frac{U^{n+1} - U^n}{\Delta t} = R(U^{n+1})\]</div>
+<p>Linearised as:</p>
+<div class="math notranslate nohighlight">
+\[\left[\frac{V}{\Delta t} I - \frac{\partial R}{\partial U}\right] \Delta U = R(U^n)\]</div>
+<p>Three LHS variants are available:</p>
+<p><strong>Backward Euler + FULL:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = BE
+NUM_LHS_JAC  = FULL
+NUM_LSS_ALG  = GMRES
+NUM_LSS_PC   = ASM
+NUM_LSS_RTOL = 1.d-12
+NUM_CFL      = 50
+</pre></div>
+</div>
+<p><strong>Backward Euler + DIAG (point-implicit):</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = BE
+NUM_LHS_JAC  = DIAG
+NUM_CFL      = 10
+</pre></div>
+</div>
+<p><strong>Backward Euler + DPLR (line relaxation):</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT = BE
+NUM_LHS_JAC  = DPLR
+NUM_CFL      = 100
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">class_be.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">be.F90</span></code> (FULL)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">class_be_diag.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">be_diag.F90</span></code> (DIAG)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">class_be_dplr.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">be_dplr.F90</span></code> (DPLR)</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>DPLR is not available for parallel 1D simulations. Sponge zones are not
+supported with <code class="docutils literal notranslate"><span class="pre">BE</span></code>.</p>
+</div>
+</section>
+</section>
+<section id="dual-time-stepping">
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">Dual-Time Stepping</a><a class="headerlink" href="#dual-time-stepping" title="Link to this heading"></a></h2>
+<p>For time-accurate implicit simulations, HEGEL uses dual-time stepping: an
+inner pseudo-time iteration drives the solution to convergence at each
+physical time level. Enable with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_DUAL_TIME = T
+</pre></div>
+</div>
+<p>Key parameters:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 15.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_MAX_IT</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Maximum sub-iterations per physical time step</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_RES</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Convergence threshold (residual L2 norm)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_WRMS_LIM</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Convergence threshold (WRMS error)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_WRMS_RTOL</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Relative tolerance for WRMS test</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_WRMS_ATOL</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Absolute tolerance for WRMS test</p></td>
+</tr>
+</tbody>
+</table>
+<section id="three-point-backward-bdf2">
+<span id="ti-3pb"></span><h3><a class="toc-backref" href="#id13" role="doc-backlink">Three-Point Backward (BDF2)</a><a class="headerlink" href="#three-point-backward-bdf2" title="Link to this heading"></a></h3>
+<p>Second-order implicit time-accurate method using three time levels:</p>
+<div class="math notranslate nohighlight">
+\[\frac{3 U^{n+1} - 4 U^n + U^{n-1}}{2 \Delta t} = R(U^{n+1})\]</div>
+<p>Implemented as a special case of the general unsteady formulation with
+<span class="math notranslate nohighlight">\(\theta = 1\)</span>, <span class="math notranslate nohighlight">\(\phi = 0.5\)</span>.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT      = 3PB
+NUM_DUAL_TIME     = T
+NUM_RUN_MODE      = CONSTANT_DT
+NUM_DT            = 1.0e-6
+NUM_DUAL_TIME_MAX_IT = 20
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">class_tpb_dt.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">tpb_dt.F90</span></code> (FULL)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">class_tpb_dt_diag.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">tpb_dt_diag.F90</span></code> (DIAG)</p></li>
+</ul>
+</section>
+<section id="crank-nicolson">
+<span id="ti-cn"></span><h3><a class="toc-backref" href="#id14" role="doc-backlink">Crank-Nicolson</a><a class="headerlink" href="#crank-nicolson" title="Link to this heading"></a></h3>
+<p>Second-order implicit time-accurate method:</p>
+<div class="math notranslate nohighlight">
+\[\frac{U^{n+1} - U^n}{\Delta t} = \frac{1}{2}\bigl[R(U^{n+1}) + R(U^n)\bigr]\]</div>
+<p>Implemented with <span class="math notranslate nohighlight">\(\theta = 0.5\)</span>, <span class="math notranslate nohighlight">\(\phi = 0\)</span>.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_TIME_INT      = CN
+NUM_DUAL_TIME     = T
+NUM_RUN_MODE      = CONSTANT_DT
+NUM_DT            = 1.0e-6
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">class_cn_dt.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">cn_dt.F90</span></code></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only <code class="docutils literal notranslate"><span class="pre">FULL</span></code> LHS approximation is available for Crank-Nicolson.</p>
+</div>
+</section>
+</section>
+<section id="run-modes-and-cfl-control">
+<h2><a class="toc-backref" href="#id15" role="doc-backlink">Run Modes and CFL Control</a><a class="headerlink" href="#run-modes-and-cfl-control" title="Link to this heading"></a></h2>
+<p>Two run modes control how the time step is determined:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CONSTANT_CFL</span></code></p></td>
+<td><p>Local time step computed per cell from CFL/VNN condition. Used for
+steady-state acceleration (time steps vary spatially).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CONSTANT_DT</span></code></p></td>
+<td><p>Global uniform time step. Required for time-accurate and dual-time
+simulations.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>CFL-related parameters:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_CFL      = 1.0        # CFL number
+NUM_VNN      = 0.5        # Von Neumann number (viscous stability)
+NUM_RUN_MODE = CONSTANT_CFL
+</pre></div>
+</div>
+<p><strong>CFL ramping:</strong> The CFL number can be ramped during the simulation using a
+CFL table file specified in the boundary condition file. This allows gradual
+increase of CFL from a safe initial value to a large target value for
+steady-state convergence.</p>
+<p><strong>RHS time-step options:</strong></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RHS_TIME_STEP_MULT_GLOBAL</span></code></p></td>
+<td><p>RHS multiplied by global <span class="math notranslate nohighlight">\(\Delta t\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RHS_TIME_STEP_MULT_LOCAL</span></code></p></td>
+<td><p>RHS multiplied by local <span class="math notranslate nohighlight">\(\Delta t\)</span> (per cell)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RHS_NO_TIME_STEP_MULT_VOL_DIV</span></code></p></td>
+<td><p>No time-step multiplication (steady formulation)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="petsc-linear-solver-options">
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">PETSc Linear Solver Options</a><a class="headerlink" href="#petsc-linear-solver-options" title="Link to this heading"></a></h2>
+<p>When using <code class="docutils literal notranslate"><span class="pre">NUM_LHS_JAC</span> <span class="pre">=</span> <span class="pre">FULL</span></code>, the linear system is solved by PETSc KSP.
+The following parameters control the linear solver:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 15.0%" />
+<col style="width: 55.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Example</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_ALG</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GMRES</span></code></p></td>
+<td><p>KSP algorithm</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_PC</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ASM</span></code></p></td>
+<td><p>Preconditioner (<code class="docutils literal notranslate"><span class="pre">ASM</span></code>, <code class="docutils literal notranslate"><span class="pre">ILU</span></code>, <code class="docutils literal notranslate"><span class="pre">NONE</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_RTOL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.d-12</span></code></p></td>
+<td><p>Relative convergence tolerance</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_MAX_NB_IT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">100</span></code></p></td>
+<td><p>Maximum GMRES iterations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_RESTART_NB_IT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p></td>
+<td><p>GMRES restart interval</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_JAC_UPDATE_RATE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>Update Jacobian every N sub-iterations</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="flux_schemes.html" class="btn btn-neutral float-left" title="Flux Schemes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="spatial_discretization.html" class="btn btn-neutral float-right" title="Spatial Discretization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alessandro Munafo, Marco Panesi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

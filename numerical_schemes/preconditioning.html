@@ -1,0 +1,540 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preconditioning &mdash; HEGEL 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script>window.MathJax = {"tex": {"macros": {"RR": "\\mathbb{R}", "vect": ["\\mathbf{#1}", 1], "pd": ["\\frac{\\partial #1}{\\partial #2}", 2]}}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Input Parameter Reference" href="input_reference.html" />
+    <link rel="prev" title="Source Terms" href="source_terms.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            HEGEL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#required-packages">Required Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#building-petsc">Building PETSc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#building-hegel-with-autotools">Building HEGEL with Autotools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-1-bootstrap">Step 1: Bootstrap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-2-configure">Step 2: Configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-3-build-and-install">Step 3: Build and Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-4-environment-setup">Step 4: Environment Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#running-a-case">Running a Case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#running-hegel">Running HEGEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#available-test-cases">Available Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#configure-options-for-fluid-models">Configure Options for Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#optional-library-integration">Optional Library Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#typical-simulation-workflow">Typical Simulation Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#output-formats">Output Formats</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory &amp; Physics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#design-philosophy">Design Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#fluid-models">Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#multi-physics-coupling">Multi-Physics Coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#demonstrated-applications">Demonstrated Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../physics.html">Physics and Numerical Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#governing-equations">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#space-discretization">Space Discretization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#inviscid-flux">Inviscid Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#diffusive-flux">Diffusive Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#time-integration">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#grid-system">Grid System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#solution-strategy-for-steady-state-problems">Solution Strategy for Steady-State Problems</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Numerical Schemes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Numerical Schemes</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#quick-reference">Quick Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="flux_schemes.html">Flux Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#availability-matrix">Availability Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#ausm-family">AUSM Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#roe-family">Roe Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#van-leer-flux-vector-splitting">Van Leer Flux-Vector Splitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#hlle">HLLE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#steger-warming">Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#modified-steger-warming">Modified Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#lax-friedrichs">Lax-Friedrichs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#central-and-hybrid-schemes">Central and Hybrid Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#flux-jacobian-approximations">Flux Jacobian Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="time_integration.html">Time Integration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#explicit-methods">Explicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#implicit-methods">Implicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#run-modes-and-cfl-control">Run Modes and CFL Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#petsc-linear-solver-options">PETSc Linear Solver Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_discretization.html">Spatial Discretization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-procedures">Reconstruction Procedures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-variable-sets">Reconstruction Variable Sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#slope-limiters">Slope Limiters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-availability-by-model">Reconstruction Availability by Model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="boundary_conditions.html">Boundary Conditions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#inviscid-euler-boundary-conditions">Inviscid (Euler) Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#subsonic-inlet-outlet">Subsonic Inlet / Outlet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#viscous-navier-stokes-wall-conditions">Viscous (Navier-Stokes) Wall Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#lodi-non-reflecting-boundary-conditions">LODI Non-Reflecting Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#internal-boundaries">Internal Boundaries</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_terms.html">Source Terms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#geometric-source-terms">Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#viscous-geometric-source-terms">Viscous Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#chemical-kinetics-source-terms">Chemical Kinetics Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#electromagnetic-source-terms">Electromagnetic Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#radiation-source-terms">Radiation Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#verification-source-terms">Verification Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#sponge-layers">Sponge Layers</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Preconditioning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#available-preconditioners">Available Preconditioners</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#weiss-smith-preconditioning">Weiss-Smith Preconditioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#input-settings">Input Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compatibility">Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grid-adaptation">Grid Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_reference.html">Input Parameter Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#fluid-model-selection">Fluid Model Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#numerical-flux">Numerical Flux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#reconstruction">Reconstruction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#time-integration">Time Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#linear-solver-petsc-ksp">Linear Solver (PETSc KSP)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#source-terms">Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#grid-adaptation">Grid Adaptation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#complete-input-file-example">Complete Input File Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Software Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#main-class-structure">Main Class Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#source-directory-structure">Source Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#multi-block-parallelization">Multi-Block Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#coupling-architecture">Coupling Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#build-system">Build System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#ci-cd">CI/CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_fortran.html">Fortran API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_fortran.html#key-modules">Key Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_doxygen.html">Doxygen API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_doxygen.html#source-files">Source Files</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HEGEL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Numerical Schemes</a></li>
+      <li class="breadcrumb-item active">Preconditioning</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/numerical_schemes/preconditioning.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="preconditioning">
+<span id="id1"></span><h1>Preconditioning<a class="headerlink" href="#preconditioning" title="Link to this heading"></a></h1>
+<p>At low Mach numbers, the compressible Euler/Navier-Stokes equations become
+poorly conditioned: the ratio of the largest to smallest eigenvalues
+(<span class="math notranslate nohighlight">\(|u+c|/|u|\)</span>) diverges as <span class="math notranslate nohighlight">\(M \to 0\)</span>. This causes slow
+convergence for implicit solvers and excessive numerical dissipation for
+upwind flux schemes. Preconditioning rescales the eigenvalues to improve
+both.</p>
+<nav class="contents local" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#available-preconditioners" id="id2">Available Preconditioners</a></p></li>
+<li><p><a class="reference internal" href="#weiss-smith-preconditioning" id="id3">Weiss-Smith Preconditioning</a></p></li>
+<li><p><a class="reference internal" href="#input-settings" id="id4">Input Settings</a></p></li>
+<li><p><a class="reference internal" href="#compatibility" id="id5">Compatibility</a></p></li>
+<li><p><a class="reference internal" href="#grid-adaptation" id="id6">Grid Adaptation</a></p>
+<ul>
+<li><p><a class="reference internal" href="#gnoffo-hartung-grid-adaptation" id="id7">Gnoffo-Hartung Grid Adaptation</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="available-preconditioners">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Available Preconditioners</a><a class="headerlink" href="#available-preconditioners" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 25.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NONE</span></code></p></td>
+<td><p>No preconditioning</p></td>
+<td><p>Standard compressible formulation (default)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">WS</span></code></p></td>
+<td><p>Weiss-Smith</p></td>
+<td><p>Low-Mach preconditioning of eigenvalues and flux dissipation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CM</span></code></p></td>
+<td><p>Choi-Merkle</p></td>
+<td><p>Defined in data structures but <strong>not implemented</strong></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Data constants:</strong> <code class="docutils literal notranslate"><span class="pre">src/data/data_pc.F90</span></code></p>
+</section>
+<section id="weiss-smith-preconditioning">
+<span id="pc-weiss-smith"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">Weiss-Smith Preconditioning</a><a class="headerlink" href="#weiss-smith-preconditioning" title="Link to this heading"></a></h2>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="10">
+<li><ol class="upperalpha simple" start="13">
+<li><p>Weiss, W. A. Smith, <em>AIAA J.</em> <strong>33</strong>, 2050–2057 (1995).</p></li>
+</ol>
+</li>
+</ol>
+</div>
+<p>The Weiss-Smith preconditioner modifies the pseudo-time derivative by
+replacing the identity with a preconditioning matrix <span class="math notranslate nohighlight">\(\Gamma^{-1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\Gamma^{-1} \frac{\partial U}{\partial \tau} +
+\frac{\partial F}{\partial x} + \frac{\partial G}{\partial y} = S\]</div>
+<p>The preconditioning matrix in primitive variables
+<span class="math notranslate nohighlight">\(Q = (p, u, v, w, T)^T\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Gamma_p = \begin{pmatrix}
+\theta &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+\theta u &amp; \rho &amp; 0 &amp; 0 &amp; 0 \\
+\theta v &amp; 0 &amp; \rho &amp; 0 &amp; 0 \\
+\theta w &amp; 0 &amp; 0 &amp; \rho &amp; 0 \\
+\theta H - 1 &amp; \rho u &amp; \rho v &amp; \rho w &amp; \rho c_v
+\end{pmatrix}\end{split}\]</div>
+<p>where the preconditioning parameter is:</p>
+<div class="math notranslate nohighlight">
+\[\theta = \frac{1}{M_{rs}^2 c^2} + \frac{\gamma - 1}{c^2}\]</div>
+<p>and the reference Mach number is:</p>
+<div class="math notranslate nohighlight">
+\[M_{rs} = \min\bigl(\max(M, \epsilon_{pc}), 1\bigr)\]</div>
+<p>This clamps the reference Mach number between a floor value
+<span class="math notranslate nohighlight">\(\epsilon_{pc}\)</span> and 1, ensuring that preconditioning is active only at
+low Mach numbers and smoothly transitions to the unmodified system at
+<span class="math notranslate nohighlight">\(M \ge 1\)</span>.</p>
+<p><strong>Modified eigenvalues:</strong> Defining <span class="math notranslate nohighlight">\(\alpha = \tfrac{1}{2}(1 - M_{rs}^2)\)</span>,
+the preconditioned wave speeds used in the dissipation term are:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}V_n' &amp;= (1 - \alpha)\,u_n = \tfrac{1}{2}(1 + M_{rs}^2)\,u_n \\
+c'   &amp;= \sqrt{\alpha^2 u_n^2 + M_{rs}^2 c^2}\end{split}\]</div>
+<p>The preconditioned eigenvalues are <span class="math notranslate nohighlight">\(|V_n' \pm c'|\)</span> for the acoustic
+waves and <span class="math notranslate nohighlight">\(|u_n|\)</span> for the entropy and shear waves. As
+<span class="math notranslate nohighlight">\(M \to 0\)</span>, all eigenvalues become <span class="math notranslate nohighlight">\(O(u)\)</span>, eliminating the
+disparity between acoustic and convective speeds.</p>
+</section>
+<section id="input-settings">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Input Settings</a><a class="headerlink" href="#input-settings" title="Link to this heading"></a></h2>
+<p><strong>Activation:</strong></p>
+<p>Preconditioning is activated by selecting a preconditioned flux scheme:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX    = ROE_IPC_WS    # Inviscid Preconditioned Roe
+FLUID_M_INF = 0.3           # Reference Mach number
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX    = ROE_VPC_WS    # Viscous Preconditioned Roe
+FLUID_M_INF = 0.1
+</pre></div>
+</div>
+<p><strong>Key parameters:</strong></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FLUID_M_INF</span></code></p></td>
+<td><p>Reference (freestream) Mach number for preconditioning scaling</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_FLUX</span></code></p></td>
+<td><p>Must be <code class="docutils literal notranslate"><span class="pre">ROE_IPC_WS</span></code> or <code class="docutils literal notranslate"><span class="pre">ROE_VPC_WS</span></code> to activate</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_pc.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">pc_mat</span></code>, <code class="docutils literal notranslate"><span class="pre">WSp_pc_mat</span></code>, <code class="docutils literal notranslate"><span class="pre">WS_pc_mat</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_roe_pc.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">roe_IPC_WS_flux</span></code>, <code class="docutils literal notranslate"><span class="pre">roe_VPC_WS_flux</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_roe_utils_pc.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">roe_WS_diss_term</span></code>)</p></li>
+</ul>
+<p><strong>Time-step computation:</strong> When preconditioning is active, the time step uses
+the preconditioned eigenvalues (<code class="docutils literal notranslate"><span class="pre">time_step_WS_ipc</span></code>).</p>
+</section>
+<section id="compatibility">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Compatibility</a><a class="headerlink" href="#compatibility" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>Compatible</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Fluid models</p></td>
+<td><p>EU/NS (calorically perfect gas) <strong>only</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>LTE / NLTE</p></td>
+<td><p><strong>Not implemented</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>ICP</p></td>
+<td><p><strong>Not implemented</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>Flux schemes</p></td>
+<td><p>Roe (IPC/VPC variants only)</p></td>
+</tr>
+<tr class="row-even"><td><p>Reconstruction</p></td>
+<td><p>All procedures</p></td>
+</tr>
+<tr class="row-odd"><td><p>Time integrators</p></td>
+<td><p>All (CFL based on preconditioned eigenvalues)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Preconditioning is currently available <strong>only</strong> for the calorically perfect
+gas (EU/NS) model with the Roe flux scheme. Multi-species or
+multi-temperature models do not support preconditioning.</p>
+</div>
+</section>
+<section id="grid-adaptation">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Grid Adaptation</a><a class="headerlink" href="#grid-adaptation" title="Link to this heading"></a></h2>
+<p>Although not a preconditioning method, HEGEL’s shock-aligned grid adaptation
+(Gnoffo-Hartung method) is another technique for improving solution quality
+and is documented here for completeness.</p>
+<section id="gnoffo-hartung-grid-adaptation">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Gnoffo-Hartung Grid Adaptation</a><a class="headerlink" href="#gnoffo-hartung-grid-adaptation" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="16">
+<li><ol class="upperalpha simple">
+<li><p>Gnoffo, <em>AIAA Paper 83-1913</em> (1983).</p></li>
+</ol>
+</li>
+</ol>
+</div>
+<p>Redistributes grid points along wall-normal lines to cluster cells near the
+bow shock and in the boundary layer. Uses B-spline interpolation for smooth
+redistribution.</p>
+<p><strong>Input parameters:</strong></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 15.0%" />
+<col style="width: 55.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F</span></code></p></td>
+<td><p>Enable/disable adaptation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_MAX</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Maximum number of adaptations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_RATE</span></code></p></td>
+<td><p>1000</p></td>
+<td><p>Iterations between adaptations</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_START_ITER</span></code></p></td>
+<td><p>0</p></td>
+<td><p>First iteration to adapt</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_AT_RESTART</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F</span></code></p></td>
+<td><p>Adapt on restart</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_F_BL</span></code></p></td>
+<td><p>0.5</p></td>
+<td><p>Fraction of cells in boundary layer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_F_SH</span></code></p></td>
+<td><p>0.9</p></td>
+<td><p>Fraction of cells in shock layer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_EPS0</span></code></p></td>
+<td><p>6.25</p></td>
+<td><p>Clustering factor at shock</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_SHOCK_VAR</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RHO</span></code></p></td>
+<td><p>Shock detection variable (<code class="docutils literal notranslate"><span class="pre">RHO</span></code>, <code class="docutils literal notranslate"><span class="pre">P</span></code>, <code class="docutils literal notranslate"><span class="pre">T</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_SHOCK_VAR_RISE</span></code></p></td>
+<td><p>1.2</p></td>
+<td><p>Rise factor for shock detection threshold</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>MESH_ADAPT              = T
+MESH_ADAPT_MAX          = 3
+MESH_ADAPT_RATE         = 500
+MESH_ADAPT_F_BL         = 0.4
+MESH_ADAPT_F_SH         = 0.85
+MESH_ADAPT_SHOCK_VAR    = RHO
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/grid_adapt/class_grid_adapt.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/grid_adapt/grid_adapt_blunt_body_utils_shock_2d.F90</span></code> (shock detection, 2D)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/grid_adapt/grid_adapt_blunt_body_utils_shock_3d.F90</span></code> (shock detection, 3D)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/data/data_opt_mesh.F90</span></code> (parameter definitions)</p></li>
+</ul>
+<p><strong>Supported geometries:</strong> 1D, 2D, 3D blunt body configurations.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="source_terms.html" class="btn btn-neutral float-left" title="Source Terms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="input_reference.html" class="btn btn-neutral float-right" title="Input Parameter Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alessandro Munafo, Marco Panesi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

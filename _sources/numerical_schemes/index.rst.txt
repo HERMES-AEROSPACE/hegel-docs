@@ -1,0 +1,175 @@
+.. _numerical-schemes:
+
+==================
+Numerical Schemes
+==================
+
+HEGEL employs a cell-centered finite volume method on multi-block structured
+grids. This section provides a comprehensive reference for every numerical
+scheme, flux function, time integrator, reconstruction method, boundary
+condition, and source term available in the solver.
+
+.. note::
+
+   All scheme selection is performed at **runtime** through the input file.
+   There are no compile-time flags that gate individual schemes (only entire
+   physics modules such as NLTE or ICP are conditional). The input keyword for
+   each option is listed in the tables below.
+
+
+Quick Reference
+===============
+
+The following table maps input keywords to the scheme they select. Use
+cross-references to jump to the detailed description.
+
+.. list-table:: Flux Schemes
+   :header-rows: 1
+   :widths: 20 40 40
+
+   * - Keyword
+     - Scheme
+     - Recommended Use
+   * - ``ROE``
+     - :ref:`Roe approximate Riemann solver <flux-roe>`
+     - General-purpose; good shock resolution
+   * - ``AUSM``
+     - :ref:`AUSM (original) <flux-ausm>`
+     - Legacy; prefer AUSM+ or newer
+   * - ``AUSM_PLUS``
+     - :ref:`AUSM+ <flux-ausm-plus>`
+     - All-speed; good for mixed sub/supersonic
+   * - ``AUSM_PLUS_UP``
+     - :ref:`AUSM+-up <flux-ausm-plus-up>`
+     - Low-Mach to hypersonic
+   * - ``AUSM_PLUS_UP2``
+     - :ref:`AUSM+-up2 <flux-ausm-plus-up2>`
+     - Hypersonic heating; improved pressure flux
+   * - ``VAN_LEER``
+     - :ref:`Van Leer FVS <flux-van-leer>`
+     - Robust; diffusive at contact discontinuities
+   * - ``HLLE``
+     - :ref:`HLLE <flux-hlle>`
+     - Positivity-preserving; diffusive
+   * - ``SW``
+     - :ref:`Steger-Warming FVS <flux-steger-warming>`
+     - Legacy flux-vector splitting
+   * - ``MOD_SW``
+     - :ref:`Modified Steger-Warming <flux-mod-steger-warming>`
+     - Improved SW with reduced dissipation
+   * - ``LF``
+     - :ref:`Lax-Friedrichs <flux-lax-friedrichs>`
+     - Maximum dissipation; baseline/debugging
+   * - ``ROE_IPC_WS``
+     - :ref:`Preconditioned Roe (inviscid) <flux-roe-pc>`
+     - Low-Mach flows with Weiss-Smith
+   * - ``ROE_VPC_WS``
+     - :ref:`Preconditioned Roe (viscous) <flux-roe-pc>`
+     - Low-Mach viscous flows
+   * - ``BLEND_UP_SKEW_SYM4``
+     - :ref:`Hybrid upwind-central <flux-hybrid>`
+     - LES / under-resolved turbulence
+
+.. list-table:: Time Integrators
+   :header-rows: 1
+   :widths: 15 35 20 30
+
+   * - Keyword
+     - Scheme
+     - Type
+     - Recommended Use
+   * - ``FE``
+     - :ref:`Forward Euler <ti-fe>`
+     - Explicit
+     - Debugging only
+   * - ``RK2`` / ``RK4``
+     - :ref:`Classical Runge-Kutta <ti-rk>`
+     - Explicit
+     - Time-accurate simulations
+   * - ``RK2_SSP`` / ``RK3_SSP``
+     - :ref:`SSP Runge-Kutta <ti-rk-ssp>`
+     - Explicit
+     - Discontinuities (TVD property)
+   * - ``RK_LS``
+     - :ref:`Low-storage RK <ti-rk-ls>`
+     - Explicit
+     - Memory-constrained runs
+   * - ``RK_LS_PI``
+     - :ref:`Low-storage RK (point-implicit) <ti-rk-ls-pi>`
+     - Semi-implicit
+     - Stiff source terms
+   * - ``STRANG`` / ``OS``
+     - :ref:`Strang splitting <ti-strang>`
+     - Splitting
+     - Reacting flows (flux + chemistry)
+   * - ``BE``
+     - :ref:`Backward Euler <ti-be>`
+     - Implicit
+     - Steady-state acceleration
+   * - ``3PB``
+     - :ref:`Three-point backward (BDF2) <ti-3pb>`
+     - Implicit
+     - 2nd-order time-accurate (dual-time)
+   * - ``CN``
+     - :ref:`Crank-Nicolson <ti-cn>`
+     - Implicit
+     - 2nd-order time-accurate (dual-time)
+
+.. list-table:: Reconstruction Procedures
+   :header-rows: 1
+   :widths: 20 15 15 50
+
+   * - Keyword
+     - Order
+     - Stencil
+     - Description
+   * - ``CONST``
+     - 1st
+     - 2
+     - :ref:`Piecewise constant (no reconstruction) <rec-const>`
+   * - ``MUSCL``
+     - 2nd
+     - 4
+     - :ref:`MUSCL with Van Albada limiter <rec-muscl>`
+   * - ``WENO3``
+     - 3rd
+     - 4
+     - :ref:`WENO 3rd-order <rec-weno3>`
+   * - ``WENO5``
+     - 5th
+     - 6
+     - :ref:`WENO 5th-order <rec-weno5>`
+   * - ``MP3``
+     - 3rd
+     - 4
+     - :ref:`Monotonicity-Preserving 3rd-order <rec-mp3>`
+   * - ``MP5``
+     - 5th
+     - 6
+     - :ref:`Monotonicity-Preserving 5th-order <rec-mp5>`
+
+.. list-table:: Reconstruction Variables
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Keyword
+     - Variables
+   * - ``RHOVP``
+     - Primitive: :math:`(\rho, \mathbf{v}, p)`
+   * - ``CHAR_RHOVP``
+     - Characteristic projection of :math:`(\rho, \mathbf{v}, p)`
+   * - ``RHOVT``
+     - Primitive: :math:`(\rho, \mathbf{v}, T)` (LTE only)
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents
+
+   flux_schemes
+   time_integration
+   spatial_discretization
+   boundary_conditions
+   source_terms
+   preconditioning
+   input_reference

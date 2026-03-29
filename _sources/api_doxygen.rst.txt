@@ -1,0 +1,13 @@
+Doxygen API Documentation
+=========================
+
+This section provides auto-generated API documentation from the HEGEL
+source code via Doxygen and Breathe.
+
+Source Files
+------------
+
+.. breathe-apidoc::
+   :project: HEGEL
+   :members:
+   :undoc-members:

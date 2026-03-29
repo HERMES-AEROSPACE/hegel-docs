@@ -1,0 +1,407 @@
+.. _source-terms:
+
+=============
+Source Terms
+=============
+
+HEGEL's governing equations include volumetric source terms for geometry,
+chemistry, electromagnetic coupling, radiation, and other physics. Source
+terms are activated via keywords in the input and boundary-condition files.
+
+.. contents:: On this page
+   :local:
+   :depth: 2
+
+
+Summary
+=======
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 8 20 50
+
+   * - Keyword
+     - ID
+     - Preprocessor Guard
+     - Description
+   * - ``QUASI_1D``
+     - 1
+     - --
+     - Quasi-1D area-variation pressure source
+   * - ``GRAVITY``
+     - 2
+     - --
+     - Gravitational body force
+   * - ``SPH_1D``
+     - 3
+     - --
+     - Spherical 1D geometry
+   * - ``INV_STAG``
+     - 4
+     - --
+     - Stagnation-line flow (blunt body)
+   * - ``INV_AXISYM``
+     - 5
+     - --
+     - Axisymmetric inviscid (no swirl)
+   * - ``INV_AXISYM_SWIRL``
+     - 6
+     - --
+     - Axisymmetric inviscid (with swirl)
+   * - ``KINETICS``
+     - 7
+     - ``HEGEL_HAVE_NLTE_LIBRARY``
+     - Chemical kinetics (NLTE)
+   * - ``LIB``
+     - 8
+     - --
+     - Generic external library source
+   * - ``JOULE_PRECICE``
+     - 10
+     - ``HEGEL_HAVE_PRECICE``
+     - Joule heating via preCICE coupling
+   * - ``RAD_LOSS``
+     - 11
+     - --
+     - Optically thin radiation loss
+   * - ``RELAX``
+     - 12
+     - --
+     - Relaxation (verification/testing)
+
+**Data constants:** ``src/data/data_src_proc.F90``
+
+
+Geometric Source Terms
+======================
+
+When the governing equations are expressed in non-Cartesian coordinates,
+geometric source terms arise from the coordinate transformation.
+
+Axisymmetric (No Swirl)
+------------------------
+
+For 2D axisymmetric simulations where the radial coordinate is :math:`r` and
+the radial velocity is :math:`v`:
+
+.. math::
+
+   S_\text{axisym} = -\frac{v}{r}
+   \begin{pmatrix}
+   \rho_1 \\ \vdots \\ \rho_{n_s} \\ \rho u \\ \rho v \\
+   \rho E \\ \rho e_2 \\ \vdots
+   \end{pmatrix}
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = INV_AXISYM
+
+**Source:** ``src/fluid/fluid_model_src_term.F90`` (``axisym_inv_src``)
+
+Axisymmetric (With Swirl)
+---------------------------
+
+Extends the axisymmetric source to include circumferential velocity :math:`w`:
+
+.. math::
+
+   S_\text{swirl} = S_\text{axisym} + \frac{1}{r}
+   \begin{pmatrix}
+   0 \\ \vdots \\ 0 \\ 0 \\ \rho w^2 \\ -2v\rho w \\ 0 \\ \vdots
+   \end{pmatrix}
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = INV_AXISYM_SWIRL
+
+**Source:** ``src/fluid/fluid_model_src_term.F90`` (``axisym_swirl_inv_src``)
+
+Stagnation-Line Flow
+---------------------
+
+Source terms for blunt-body stagnation-line flows in spherical-like
+coordinates. Uses the Gnoffo-Hartung geometric factor for grid adaptation.
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = INV_STAG
+
+**Source:** ``src/fluid/fluid_model_src_term.F90`` (``stag_line_src``)
+
+Quasi-1D Area Variation
+-------------------------
+
+Pressure source from area variation :math:`dA/dx` in a quasi-1D channel:
+
+.. math::
+
+   S = \frac{p \, dA/dx}{A} \hat{e}_x
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = QUASI_1D
+
+**Source:** ``src/fluid/fluid_model_src_term.F90`` (``geom_p_src``)
+
+Gravity
+--------
+
+Body force from gravitational acceleration :math:`\mathbf{g}`:
+
+.. math::
+
+   S_\text{grav} =
+   \begin{pmatrix}
+   0 \\ \rho g_x \\ \rho g_y \\ [\rho g_z] \\ \rho \mathbf{v} \cdot \mathbf{g}
+   \end{pmatrix}
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = GRAVITY
+
+**Source:** ``src/fluid/fluid_model_src_term.F90`` (``gravity_src``)
+
+
+Viscous Geometric Source Terms
+==============================
+
+When viscous (Navier-Stokes) equations are solved in axisymmetric coordinates,
+additional source terms arise from the viscous stress tensor:
+
+.. math::
+
+   S_\text{vis,axisym} = \frac{1}{r}
+   \begin{pmatrix}
+   J_{s,r} \\ \tau_{xr} u + \tau_{rr} v - q_r \\ \tau_{rr} - \tau_{\theta\theta}
+   \end{pmatrix}
+
+where :math:`J_{s,r}` are the species diffusion fluxes and :math:`q_r` is
+the radial heat flux.
+
+**Source files:**
+
+- ``src/fluid/fluid_model_diff_src_term.F90`` (``axisym_vis_src``, ``axisym_swirl_vis_src``)
+- ``src/fluid/fluid_model_nlte_diff_src_term.F90`` (``axisym_vis_src_nlte`` for NLTE models)
+
+These are activated automatically when the geometry is axisymmetric and a
+Navier-Stokes model is used.
+
+
+Chemical Kinetics Source Terms
+==============================
+
+.. admonition:: Compile requirement
+
+   Requires ``--with-plato`` (defines ``HEGEL_HAVE_NLTE_LIBRARY``).
+
+For non-equilibrium (NLTE) models, chemical kinetics source terms provide
+species production/destruction rates and energy exchange:
+
+.. math::
+
+   S_\text{chem} =
+   \begin{pmatrix}
+   \dot{\omega}_1 \\ \vdots \\ \dot{\omega}_{n_s} \\ 0 \\ 0 \\ 0 \\
+   \Omega_2 \\ \vdots \\ \Omega_{n_t}
+   \end{pmatrix}
+
+where :math:`\dot{\omega}_s` are the species mass production rates and
+:math:`\Omega_k` are the energy exchange terms between temperature modes.
+
+All constitutive relations are provided by **PLATO** through its API
+(``nlte_library_get_source``). The solver has no built-in knowledge of
+reaction mechanisms or rate constants.
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = KINETICS
+
+**Source files:**
+
+- ``src/fluid/fluid_model_nlte_src_term.F90`` (``kinetics_src``, ``kinetics_src_jac``)
+- ``src/data/data_nlte_library.F90`` (PLATO API bindings)
+
+**Jacobian:** The source term Jacobian :math:`\partial S / \partial U` is
+also obtained from PLATO (``kinetics_src_jac``) for implicit time integration.
+
+
+Electromagnetic Source Terms
+=============================
+
+ICP Joule Heating
+------------------
+
+For inductively coupled plasma (ICP) models, Joule heating and the electric
+field equations provide volumetric source terms:
+
+.. math::
+
+   S_\text{ICP} =
+   \begin{pmatrix}
+   0 \\ 0 \\ 0 \\ P_J \\ E_R/r^2 - \sigma\omega\mu_0 E_I \\
+   E_I/r^2 + \sigma\omega\mu_0 E_R
+   \end{pmatrix}
+
+where :math:`P_J` is the Joule power, :math:`\sigma` is the electrical
+conductivity, :math:`\omega` is the angular frequency, and :math:`E_R, E_I`
+are the real and imaginary components of the electric field.
+
+**Source files:**
+
+- ``src/fluid_icp_lte/ICP_LTE_src_term.F90`` (``joule_src``)
+- ``src/fluid_icp_nlte/ICP_NLTE_src_term.F90`` (``kinetics_joule_src``)
+
+Joule Heating via preCICE
+--------------------------
+
+When electromagnetic fields are computed by an external solver (FLUX) and
+coupled through preCICE:
+
+.. math::
+
+   S = \begin{pmatrix}
+   0 \\ F_{L,x} \\ F_{L,y} \\ [F_{L,z}] \\
+   \Omega_J - \Omega_\text{rad}
+   \end{pmatrix}
+
+where :math:`\mathbf{F}_L` is the Lorentz force, :math:`\Omega_J` is the
+Joule heating, and :math:`\Omega_\text{rad}` is the radiation loss.
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = JOULE_PRECICE
+
+**Compile requirement:** ``--with-precice`` (defines ``HEGEL_HAVE_PRECICE``).
+
+**Source:** ``src/fluid/fluid_model_src_term.F90`` (``joule_precice_src``)
+
+
+Radiation Source Terms
+======================
+
+Optically Thin Radiation Loss
+------------------------------
+
+Volumetric radiation loss using an optically thin correlation
+:math:`\dot{q}_\text{rad} = f(n_d, T_e)`:
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = RAD_LOSS
+
+Affects both the global energy equation and the free-electron energy equation.
+
+**Source:** ``src/fluid/fluid_model_src_term.F90`` (``rad_loss_src``)
+
+Laser Radiation
+----------------
+
+Laser energy deposition computed from the radiation transport equation.
+The laser module provides a volumetric source term coupling the radiation
+intensity field to the fluid energy equations:
+
+**Source files:**
+
+- ``src/radiation_laser/radiation_laser_source.F90`` (``laser_source``, ``laser_source_jac``)
+
+Two transport solvers are available:
+
+- **Ray solver** (``ray_solver``) --- geometric ray tracing
+- **Paraxial solver** (``parax_solver``) --- paraxial approximation for focused beams
+
+**Compile requirement:** ``--with-plato`` (defines ``HEGEL_HAVE_NLTE_LIBRARY``)
+
+
+Verification Source Terms
+==========================
+
+Relaxation Source
+------------------
+
+A simple relaxation source term for verifying time integrators:
+
+.. math::
+
+   S = \lambda_\text{relax} (U_\text{ref} - U)
+
+Drives the solution toward a reference state :math:`U_\text{ref}` with
+relaxation rate :math:`\lambda_\text{relax}`.
+
+**Input:**
+
+.. code-block:: none
+
+   SRC_TERM = RELAX
+
+**Source:** ``src/fluid_eu_ns/EU_src_term.F90`` (``relax_src``)
+
+
+Sponge Layers
+==============
+
+Sponge zones add artificial damping near boundaries to absorb outgoing
+disturbances and prevent reflections. The damping is applied as:
+
+.. math::
+
+   S_\text{sponge} = -\sigma(\mathbf{x}) (U - U_\text{ref})
+
+where :math:`\sigma(\mathbf{x})` is a spatially varying relaxation coefficient
+that increases from zero at the inner edge to :math:`\sigma_0` at the boundary.
+
+Sponge Configuration
+---------------------
+
+Sponge zones are defined in a separate file referenced by
+``MESH_SPONGE_FILE``. Each sponge zone specifies:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 85
+
+   * - Keyword
+     - Description
+   * - ``IS``, ``IE``
+     - Start and end cell indices
+   * - ``DIR``
+     - Direction: ``X``, ``Y``, ``Z``, ``XY``, ``XZ``, ``YZ``, ``XYZ``
+   * - ``FUN``
+     - Damping profile: ``POW_LAW2``, ``POW_LAW3``, ``TANH``
+   * - ``SIGMA0``
+     - Maximum relaxation coefficient
+   * - ``LREF``
+     - Reference length
+   * - ``LS``
+     - Sponge origin coordinate
+   * - ``BLOCK``
+     - Block ID
+   * - ``FIELD_FILE``
+     - File containing the reference field :math:`U_\text{ref}`
+
+**Damping profiles:**
+
+- ``POW_LAW2``: :math:`\sigma(d) = \sigma_0 (d/L)^2`
+- ``POW_LAW3``: :math:`\sigma(d) = \sigma_0 (d/L)^3`
+- ``TANH``: :math:`\sigma(d) = \sigma_0 \tanh(d/L)`
+
+**Source files:**
+
+- ``src/grid/class_sponge.F90``
+- ``src/grid/grid_boundary_sponge.F90``
+- ``src/data/data_opt_sponge.F90``

@@ -1,0 +1,654 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Source Terms &mdash; HEGEL 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script>window.MathJax = {"tex": {"macros": {"RR": "\\mathbb{R}", "vect": ["\\mathbf{#1}", 1], "pd": ["\\frac{\\partial #1}{\\partial #2}", 2]}}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Preconditioning" href="preconditioning.html" />
+    <link rel="prev" title="Boundary Conditions" href="boundary_conditions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            HEGEL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#required-packages">Required Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#building-petsc">Building PETSc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#building-hegel-with-autotools">Building HEGEL with Autotools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-1-bootstrap">Step 1: Bootstrap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-2-configure">Step 2: Configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-3-build-and-install">Step 3: Build and Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-4-environment-setup">Step 4: Environment Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#running-a-case">Running a Case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#running-hegel">Running HEGEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#available-test-cases">Available Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#configure-options-for-fluid-models">Configure Options for Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#optional-library-integration">Optional Library Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#typical-simulation-workflow">Typical Simulation Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#output-formats">Output Formats</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory &amp; Physics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#design-philosophy">Design Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#fluid-models">Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#multi-physics-coupling">Multi-Physics Coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#demonstrated-applications">Demonstrated Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../physics.html">Physics and Numerical Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#governing-equations">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#space-discretization">Space Discretization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#inviscid-flux">Inviscid Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#diffusive-flux">Diffusive Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#time-integration">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#grid-system">Grid System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#solution-strategy-for-steady-state-problems">Solution Strategy for Steady-State Problems</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Numerical Schemes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Numerical Schemes</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#quick-reference">Quick Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="flux_schemes.html">Flux Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#availability-matrix">Availability Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#ausm-family">AUSM Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#roe-family">Roe Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#van-leer-flux-vector-splitting">Van Leer Flux-Vector Splitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#hlle">HLLE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#steger-warming">Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#modified-steger-warming">Modified Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#lax-friedrichs">Lax-Friedrichs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#central-and-hybrid-schemes">Central and Hybrid Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#flux-jacobian-approximations">Flux Jacobian Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="time_integration.html">Time Integration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#explicit-methods">Explicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#implicit-methods">Implicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#run-modes-and-cfl-control">Run Modes and CFL Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#petsc-linear-solver-options">PETSc Linear Solver Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_discretization.html">Spatial Discretization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-procedures">Reconstruction Procedures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-variable-sets">Reconstruction Variable Sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#slope-limiters">Slope Limiters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-availability-by-model">Reconstruction Availability by Model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="boundary_conditions.html">Boundary Conditions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#inviscid-euler-boundary-conditions">Inviscid (Euler) Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#subsonic-inlet-outlet">Subsonic Inlet / Outlet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#viscous-navier-stokes-wall-conditions">Viscous (Navier-Stokes) Wall Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#lodi-non-reflecting-boundary-conditions">LODI Non-Reflecting Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#internal-boundaries">Internal Boundaries</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Source Terms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#geometric-source-terms">Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#viscous-geometric-source-terms">Viscous Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#chemical-kinetics-source-terms">Chemical Kinetics Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#electromagnetic-source-terms">Electromagnetic Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#radiation-source-terms">Radiation Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#verification-source-terms">Verification Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sponge-layers">Sponge Layers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="preconditioning.html">Preconditioning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#available-preconditioners">Available Preconditioners</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#weiss-smith-preconditioning">Weiss-Smith Preconditioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#input-settings">Input Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#compatibility">Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#grid-adaptation">Grid Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_reference.html">Input Parameter Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#fluid-model-selection">Fluid Model Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#numerical-flux">Numerical Flux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#reconstruction">Reconstruction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#time-integration">Time Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#linear-solver-petsc-ksp">Linear Solver (PETSc KSP)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#source-terms">Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#grid-adaptation">Grid Adaptation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#complete-input-file-example">Complete Input File Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Software Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#main-class-structure">Main Class Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#source-directory-structure">Source Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#multi-block-parallelization">Multi-Block Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#coupling-architecture">Coupling Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#build-system">Build System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#ci-cd">CI/CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_fortran.html">Fortran API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_fortran.html#key-modules">Key Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_doxygen.html">Doxygen API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_doxygen.html#source-files">Source Files</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HEGEL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Numerical Schemes</a></li>
+      <li class="breadcrumb-item active">Source Terms</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/numerical_schemes/source_terms.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="source-terms">
+<span id="id1"></span><h1>Source Terms<a class="headerlink" href="#source-terms" title="Link to this heading"></a></h1>
+<p>HEGEL’s governing equations include volumetric source terms for geometry,
+chemistry, electromagnetic coupling, radiation, and other physics. Source
+terms are activated via keywords in the input and boundary-condition files.</p>
+<nav class="contents local" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#summary" id="id2">Summary</a></p></li>
+<li><p><a class="reference internal" href="#geometric-source-terms" id="id3">Geometric Source Terms</a></p>
+<ul>
+<li><p><a class="reference internal" href="#axisymmetric-no-swirl" id="id4">Axisymmetric (No Swirl)</a></p></li>
+<li><p><a class="reference internal" href="#axisymmetric-with-swirl" id="id5">Axisymmetric (With Swirl)</a></p></li>
+<li><p><a class="reference internal" href="#stagnation-line-flow" id="id6">Stagnation-Line Flow</a></p></li>
+<li><p><a class="reference internal" href="#quasi-1d-area-variation" id="id7">Quasi-1D Area Variation</a></p></li>
+<li><p><a class="reference internal" href="#gravity" id="id8">Gravity</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#viscous-geometric-source-terms" id="id9">Viscous Geometric Source Terms</a></p></li>
+<li><p><a class="reference internal" href="#chemical-kinetics-source-terms" id="id10">Chemical Kinetics Source Terms</a></p></li>
+<li><p><a class="reference internal" href="#electromagnetic-source-terms" id="id11">Electromagnetic Source Terms</a></p>
+<ul>
+<li><p><a class="reference internal" href="#icp-joule-heating" id="id12">ICP Joule Heating</a></p></li>
+<li><p><a class="reference internal" href="#joule-heating-via-precice" id="id13">Joule Heating via preCICE</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#radiation-source-terms" id="id14">Radiation Source Terms</a></p>
+<ul>
+<li><p><a class="reference internal" href="#optically-thin-radiation-loss" id="id15">Optically Thin Radiation Loss</a></p></li>
+<li><p><a class="reference internal" href="#laser-radiation" id="id16">Laser Radiation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#verification-source-terms" id="id17">Verification Source Terms</a></p>
+<ul>
+<li><p><a class="reference internal" href="#relaxation-source" id="id18">Relaxation Source</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#sponge-layers" id="id19">Sponge Layers</a></p>
+<ul>
+<li><p><a class="reference internal" href="#sponge-configuration" id="id20">Sponge Configuration</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="summary">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Summary</a><a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22.0%" />
+<col style="width: 8.0%" />
+<col style="width: 20.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>ID</p></th>
+<th class="head"><p>Preprocessor Guard</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">QUASI_1D</span></code></p></td>
+<td><p>1</p></td>
+<td><p>–</p></td>
+<td><p>Quasi-1D area-variation pressure source</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GRAVITY</span></code></p></td>
+<td><p>2</p></td>
+<td><p>–</p></td>
+<td><p>Gravitational body force</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SPH_1D</span></code></p></td>
+<td><p>3</p></td>
+<td><p>–</p></td>
+<td><p>Spherical 1D geometry</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">INV_STAG</span></code></p></td>
+<td><p>4</p></td>
+<td><p>–</p></td>
+<td><p>Stagnation-line flow (blunt body)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INV_AXISYM</span></code></p></td>
+<td><p>5</p></td>
+<td><p>–</p></td>
+<td><p>Axisymmetric inviscid (no swirl)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">INV_AXISYM_SWIRL</span></code></p></td>
+<td><p>6</p></td>
+<td><p>–</p></td>
+<td><p>Axisymmetric inviscid (with swirl)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">KINETICS</span></code></p></td>
+<td><p>7</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">HEGEL_HAVE_NLTE_LIBRARY</span></code></p></td>
+<td><p>Chemical kinetics (NLTE)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LIB</span></code></p></td>
+<td><p>8</p></td>
+<td><p>–</p></td>
+<td><p>Generic external library source</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">JOULE_PRECICE</span></code></p></td>
+<td><p>10</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">HEGEL_HAVE_PRECICE</span></code></p></td>
+<td><p>Joule heating via preCICE coupling</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RAD_LOSS</span></code></p></td>
+<td><p>11</p></td>
+<td><p>–</p></td>
+<td><p>Optically thin radiation loss</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RELAX</span></code></p></td>
+<td><p>12</p></td>
+<td><p>–</p></td>
+<td><p>Relaxation (verification/testing)</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Data constants:</strong> <code class="docutils literal notranslate"><span class="pre">src/data/data_src_proc.F90</span></code></p>
+</section>
+<section id="geometric-source-terms">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Geometric Source Terms</a><a class="headerlink" href="#geometric-source-terms" title="Link to this heading"></a></h2>
+<p>When the governing equations are expressed in non-Cartesian coordinates,
+geometric source terms arise from the coordinate transformation.</p>
+<section id="axisymmetric-no-swirl">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Axisymmetric (No Swirl)</a><a class="headerlink" href="#axisymmetric-no-swirl" title="Link to this heading"></a></h3>
+<p>For 2D axisymmetric simulations where the radial coordinate is <span class="math notranslate nohighlight">\(r\)</span> and
+the radial velocity is <span class="math notranslate nohighlight">\(v\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}S_\text{axisym} = -\frac{v}{r}
+\begin{pmatrix}
+\rho_1 \\ \vdots \\ \rho_{n_s} \\ \rho u \\ \rho v \\
+\rho E \\ \rho e_2 \\ \vdots
+\end{pmatrix}\end{split}\]</div>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = INV_AXISYM
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">axisym_inv_src</span></code>)</p>
+</section>
+<section id="axisymmetric-with-swirl">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Axisymmetric (With Swirl)</a><a class="headerlink" href="#axisymmetric-with-swirl" title="Link to this heading"></a></h3>
+<p>Extends the axisymmetric source to include circumferential velocity <span class="math notranslate nohighlight">\(w\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}S_\text{swirl} = S_\text{axisym} + \frac{1}{r}
+\begin{pmatrix}
+0 \\ \vdots \\ 0 \\ 0 \\ \rho w^2 \\ -2v\rho w \\ 0 \\ \vdots
+\end{pmatrix}\end{split}\]</div>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = INV_AXISYM_SWIRL
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">axisym_swirl_inv_src</span></code>)</p>
+</section>
+<section id="stagnation-line-flow">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Stagnation-Line Flow</a><a class="headerlink" href="#stagnation-line-flow" title="Link to this heading"></a></h3>
+<p>Source terms for blunt-body stagnation-line flows in spherical-like
+coordinates. Uses the Gnoffo-Hartung geometric factor for grid adaptation.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = INV_STAG
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">stag_line_src</span></code>)</p>
+</section>
+<section id="quasi-1d-area-variation">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Quasi-1D Area Variation</a><a class="headerlink" href="#quasi-1d-area-variation" title="Link to this heading"></a></h3>
+<p>Pressure source from area variation <span class="math notranslate nohighlight">\(dA/dx\)</span> in a quasi-1D channel:</p>
+<div class="math notranslate nohighlight">
+\[S = \frac{p \, dA/dx}{A} \hat{e}_x\]</div>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = QUASI_1D
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">geom_p_src</span></code>)</p>
+</section>
+<section id="gravity">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Gravity</a><a class="headerlink" href="#gravity" title="Link to this heading"></a></h3>
+<p>Body force from gravitational acceleration <span class="math notranslate nohighlight">\(\mathbf{g}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}S_\text{grav} =
+\begin{pmatrix}
+0 \\ \rho g_x \\ \rho g_y \\ [\rho g_z] \\ \rho \mathbf{v} \cdot \mathbf{g}
+\end{pmatrix}\end{split}\]</div>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = GRAVITY
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">gravity_src</span></code>)</p>
+</section>
+</section>
+<section id="viscous-geometric-source-terms">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Viscous Geometric Source Terms</a><a class="headerlink" href="#viscous-geometric-source-terms" title="Link to this heading"></a></h2>
+<p>When viscous (Navier-Stokes) equations are solved in axisymmetric coordinates,
+additional source terms arise from the viscous stress tensor:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}S_\text{vis,axisym} = \frac{1}{r}
+\begin{pmatrix}
+J_{s,r} \\ \tau_{xr} u + \tau_{rr} v - q_r \\ \tau_{rr} - \tau_{\theta\theta}
+\end{pmatrix}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(J_{s,r}\)</span> are the species diffusion fluxes and <span class="math notranslate nohighlight">\(q_r\)</span> is
+the radial heat flux.</p>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_diff_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">axisym_vis_src</span></code>, <code class="docutils literal notranslate"><span class="pre">axisym_swirl_vis_src</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_nlte_diff_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">axisym_vis_src_nlte</span></code> for NLTE models)</p></li>
+</ul>
+<p>These are activated automatically when the geometry is axisymmetric and a
+Navier-Stokes model is used.</p>
+</section>
+<section id="chemical-kinetics-source-terms">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Chemical Kinetics Source Terms</a><a class="headerlink" href="#chemical-kinetics-source-terms" title="Link to this heading"></a></h2>
+<div class="admonition-compile-requirement admonition">
+<p class="admonition-title">Compile requirement</p>
+<p>Requires <code class="docutils literal notranslate"><span class="pre">--with-plato</span></code> (defines <code class="docutils literal notranslate"><span class="pre">HEGEL_HAVE_NLTE_LIBRARY</span></code>).</p>
+</div>
+<p>For non-equilibrium (NLTE) models, chemical kinetics source terms provide
+species production/destruction rates and energy exchange:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}S_\text{chem} =
+\begin{pmatrix}
+\dot{\omega}_1 \\ \vdots \\ \dot{\omega}_{n_s} \\ 0 \\ 0 \\ 0 \\
+\Omega_2 \\ \vdots \\ \Omega_{n_t}
+\end{pmatrix}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\dot{\omega}_s\)</span> are the species mass production rates and
+<span class="math notranslate nohighlight">\(\Omega_k\)</span> are the energy exchange terms between temperature modes.</p>
+<p>All constitutive relations are provided by <strong>PLATO</strong> through its API
+(<code class="docutils literal notranslate"><span class="pre">nlte_library_get_source</span></code>). The solver has no built-in knowledge of
+reaction mechanisms or rate constants.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = KINETICS
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_nlte_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">kinetics_src</span></code>, <code class="docutils literal notranslate"><span class="pre">kinetics_src_jac</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/data/data_nlte_library.F90</span></code> (PLATO API bindings)</p></li>
+</ul>
+<p><strong>Jacobian:</strong> The source term Jacobian <span class="math notranslate nohighlight">\(\partial S / \partial U\)</span> is
+also obtained from PLATO (<code class="docutils literal notranslate"><span class="pre">kinetics_src_jac</span></code>) for implicit time integration.</p>
+</section>
+<section id="electromagnetic-source-terms">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Electromagnetic Source Terms</a><a class="headerlink" href="#electromagnetic-source-terms" title="Link to this heading"></a></h2>
+<section id="icp-joule-heating">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">ICP Joule Heating</a><a class="headerlink" href="#icp-joule-heating" title="Link to this heading"></a></h3>
+<p>For inductively coupled plasma (ICP) models, Joule heating and the electric
+field equations provide volumetric source terms:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}S_\text{ICP} =
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ P_J \\ E_R/r^2 - \sigma\omega\mu_0 E_I \\
+E_I/r^2 + \sigma\omega\mu_0 E_R
+\end{pmatrix}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(P_J\)</span> is the Joule power, <span class="math notranslate nohighlight">\(\sigma\)</span> is the electrical
+conductivity, <span class="math notranslate nohighlight">\(\omega\)</span> is the angular frequency, and <span class="math notranslate nohighlight">\(E_R, E_I\)</span>
+are the real and imaginary components of the electric field.</p>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_icp_lte/ICP_LTE_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">joule_src</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_icp_nlte/ICP_NLTE_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">kinetics_joule_src</span></code>)</p></li>
+</ul>
+</section>
+<section id="joule-heating-via-precice">
+<h3><a class="toc-backref" href="#id13" role="doc-backlink">Joule Heating via preCICE</a><a class="headerlink" href="#joule-heating-via-precice" title="Link to this heading"></a></h3>
+<p>When electromagnetic fields are computed by an external solver (FLUX) and
+coupled through preCICE:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}S = \begin{pmatrix}
+0 \\ F_{L,x} \\ F_{L,y} \\ [F_{L,z}] \\
+\Omega_J - \Omega_\text{rad}
+\end{pmatrix}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{F}_L\)</span> is the Lorentz force, <span class="math notranslate nohighlight">\(\Omega_J\)</span> is the
+Joule heating, and <span class="math notranslate nohighlight">\(\Omega_\text{rad}\)</span> is the radiation loss.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = JOULE_PRECICE
+</pre></div>
+</div>
+<p><strong>Compile requirement:</strong> <code class="docutils literal notranslate"><span class="pre">--with-precice</span></code> (defines <code class="docutils literal notranslate"><span class="pre">HEGEL_HAVE_PRECICE</span></code>).</p>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">joule_precice_src</span></code>)</p>
+</section>
+</section>
+<section id="radiation-source-terms">
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">Radiation Source Terms</a><a class="headerlink" href="#radiation-source-terms" title="Link to this heading"></a></h2>
+<section id="optically-thin-radiation-loss">
+<h3><a class="toc-backref" href="#id15" role="doc-backlink">Optically Thin Radiation Loss</a><a class="headerlink" href="#optically-thin-radiation-loss" title="Link to this heading"></a></h3>
+<p>Volumetric radiation loss using an optically thin correlation
+<span class="math notranslate nohighlight">\(\dot{q}_\text{rad} = f(n_d, T_e)\)</span>:</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = RAD_LOSS
+</pre></div>
+</div>
+<p>Affects both the global energy equation and the free-electron energy equation.</p>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">rad_loss_src</span></code>)</p>
+</section>
+<section id="laser-radiation">
+<h3><a class="toc-backref" href="#id16" role="doc-backlink">Laser Radiation</a><a class="headerlink" href="#laser-radiation" title="Link to this heading"></a></h3>
+<p>Laser energy deposition computed from the radiation transport equation.
+The laser module provides a volumetric source term coupling the radiation
+intensity field to the fluid energy equations:</p>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/radiation_laser/radiation_laser_source.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">laser_source</span></code>, <code class="docutils literal notranslate"><span class="pre">laser_source_jac</span></code>)</p></li>
+</ul>
+<p>Two transport solvers are available:</p>
+<ul class="simple">
+<li><p><strong>Ray solver</strong> (<code class="docutils literal notranslate"><span class="pre">ray_solver</span></code>) — geometric ray tracing</p></li>
+<li><p><strong>Paraxial solver</strong> (<code class="docutils literal notranslate"><span class="pre">parax_solver</span></code>) — paraxial approximation for focused beams</p></li>
+</ul>
+<p><strong>Compile requirement:</strong> <code class="docutils literal notranslate"><span class="pre">--with-plato</span></code> (defines <code class="docutils literal notranslate"><span class="pre">HEGEL_HAVE_NLTE_LIBRARY</span></code>)</p>
+</section>
+</section>
+<section id="verification-source-terms">
+<h2><a class="toc-backref" href="#id17" role="doc-backlink">Verification Source Terms</a><a class="headerlink" href="#verification-source-terms" title="Link to this heading"></a></h2>
+<section id="relaxation-source">
+<h3><a class="toc-backref" href="#id18" role="doc-backlink">Relaxation Source</a><a class="headerlink" href="#relaxation-source" title="Link to this heading"></a></h3>
+<p>A simple relaxation source term for verifying time integrators:</p>
+<div class="math notranslate nohighlight">
+\[S = \lambda_\text{relax} (U_\text{ref} - U)\]</div>
+<p>Drives the solution toward a reference state <span class="math notranslate nohighlight">\(U_\text{ref}\)</span> with
+relaxation rate <span class="math notranslate nohighlight">\(\lambda_\text{relax}\)</span>.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SRC_TERM = RELAX
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_src_term.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">relax_src</span></code>)</p>
+</section>
+</section>
+<section id="sponge-layers">
+<h2><a class="toc-backref" href="#id19" role="doc-backlink">Sponge Layers</a><a class="headerlink" href="#sponge-layers" title="Link to this heading"></a></h2>
+<p>Sponge zones add artificial damping near boundaries to absorb outgoing
+disturbances and prevent reflections. The damping is applied as:</p>
+<div class="math notranslate nohighlight">
+\[S_\text{sponge} = -\sigma(\mathbf{x}) (U - U_\text{ref})\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma(\mathbf{x})\)</span> is a spatially varying relaxation coefficient
+that increases from zero at the inner edge to <span class="math notranslate nohighlight">\(\sigma_0\)</span> at the boundary.</p>
+<section id="sponge-configuration">
+<h3><a class="toc-backref" href="#id20" role="doc-backlink">Sponge Configuration</a><a class="headerlink" href="#sponge-configuration" title="Link to this heading"></a></h3>
+<p>Sponge zones are defined in a separate file referenced by
+<code class="docutils literal notranslate"><span class="pre">MESH_SPONGE_FILE</span></code>. Each sponge zone specifies:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 85.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IS</span></code>, <code class="docutils literal notranslate"><span class="pre">IE</span></code></p></td>
+<td><p>Start and end cell indices</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DIR</span></code></p></td>
+<td><p>Direction: <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>, <code class="docutils literal notranslate"><span class="pre">Z</span></code>, <code class="docutils literal notranslate"><span class="pre">XY</span></code>, <code class="docutils literal notranslate"><span class="pre">XZ</span></code>, <code class="docutils literal notranslate"><span class="pre">YZ</span></code>, <code class="docutils literal notranslate"><span class="pre">XYZ</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FUN</span></code></p></td>
+<td><p>Damping profile: <code class="docutils literal notranslate"><span class="pre">POW_LAW2</span></code>, <code class="docutils literal notranslate"><span class="pre">POW_LAW3</span></code>, <code class="docutils literal notranslate"><span class="pre">TANH</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SIGMA0</span></code></p></td>
+<td><p>Maximum relaxation coefficient</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LREF</span></code></p></td>
+<td><p>Reference length</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LS</span></code></p></td>
+<td><p>Sponge origin coordinate</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BLOCK</span></code></p></td>
+<td><p>Block ID</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FIELD_FILE</span></code></p></td>
+<td><p>File containing the reference field <span class="math notranslate nohighlight">\(U_\text{ref}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Damping profiles:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POW_LAW2</span></code>: <span class="math notranslate nohighlight">\(\sigma(d) = \sigma_0 (d/L)^2\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POW_LAW3</span></code>: <span class="math notranslate nohighlight">\(\sigma(d) = \sigma_0 (d/L)^3\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TANH</span></code>: <span class="math notranslate nohighlight">\(\sigma(d) = \sigma_0 \tanh(d/L)\)</span></p></li>
+</ul>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/grid/class_sponge.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/grid/grid_boundary_sponge.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/data/data_opt_sponge.F90</span></code></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="boundary_conditions.html" class="btn btn-neutral float-left" title="Boundary Conditions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="preconditioning.html" class="btn btn-neutral float-right" title="Preconditioning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alessandro Munafo, Marco Panesi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

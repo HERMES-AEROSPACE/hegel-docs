@@ -1,0 +1,867 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flux Schemes &mdash; HEGEL 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script>window.MathJax = {"tex": {"macros": {"RR": "\\mathbb{R}", "vect": ["\\mathbf{#1}", 1], "pd": ["\\frac{\\partial #1}{\\partial #2}", 2]}}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Time Integration" href="time_integration.html" />
+    <link rel="prev" title="Numerical Schemes" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            HEGEL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#required-packages">Required Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#building-petsc">Building PETSc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#building-hegel-with-autotools">Building HEGEL with Autotools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-1-bootstrap">Step 1: Bootstrap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-2-configure">Step 2: Configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-3-build-and-install">Step 3: Build and Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-4-environment-setup">Step 4: Environment Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#running-a-case">Running a Case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#running-hegel">Running HEGEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#available-test-cases">Available Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#configure-options-for-fluid-models">Configure Options for Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#optional-library-integration">Optional Library Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#typical-simulation-workflow">Typical Simulation Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#output-formats">Output Formats</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory &amp; Physics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#design-philosophy">Design Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#fluid-models">Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#multi-physics-coupling">Multi-Physics Coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#demonstrated-applications">Demonstrated Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../physics.html">Physics and Numerical Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#governing-equations">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#space-discretization">Space Discretization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#inviscid-flux">Inviscid Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#diffusive-flux">Diffusive Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#time-integration">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#grid-system">Grid System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#solution-strategy-for-steady-state-problems">Solution Strategy for Steady-State Problems</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Numerical Schemes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Numerical Schemes</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#quick-reference">Quick Reference</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Flux Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#availability-matrix">Availability Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ausm-family">AUSM Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#roe-family">Roe Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#van-leer-flux-vector-splitting">Van Leer Flux-Vector Splitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hlle">HLLE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#steger-warming">Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#modified-steger-warming">Modified Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lax-friedrichs">Lax-Friedrichs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#central-and-hybrid-schemes">Central and Hybrid Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flux-jacobian-approximations">Flux Jacobian Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="time_integration.html">Time Integration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#explicit-methods">Explicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#implicit-methods">Implicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#run-modes-and-cfl-control">Run Modes and CFL Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#petsc-linear-solver-options">PETSc Linear Solver Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_discretization.html">Spatial Discretization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-procedures">Reconstruction Procedures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-variable-sets">Reconstruction Variable Sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#slope-limiters">Slope Limiters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-availability-by-model">Reconstruction Availability by Model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="boundary_conditions.html">Boundary Conditions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#inviscid-euler-boundary-conditions">Inviscid (Euler) Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#subsonic-inlet-outlet">Subsonic Inlet / Outlet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#viscous-navier-stokes-wall-conditions">Viscous (Navier-Stokes) Wall Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#lodi-non-reflecting-boundary-conditions">LODI Non-Reflecting Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#internal-boundaries">Internal Boundaries</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_terms.html">Source Terms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#geometric-source-terms">Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#viscous-geometric-source-terms">Viscous Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#chemical-kinetics-source-terms">Chemical Kinetics Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#electromagnetic-source-terms">Electromagnetic Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#radiation-source-terms">Radiation Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#verification-source-terms">Verification Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#sponge-layers">Sponge Layers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="preconditioning.html">Preconditioning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#available-preconditioners">Available Preconditioners</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#weiss-smith-preconditioning">Weiss-Smith Preconditioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#input-settings">Input Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#compatibility">Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#grid-adaptation">Grid Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_reference.html">Input Parameter Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#fluid-model-selection">Fluid Model Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#numerical-flux">Numerical Flux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#reconstruction">Reconstruction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#time-integration">Time Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#linear-solver-petsc-ksp">Linear Solver (PETSc KSP)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#source-terms">Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#grid-adaptation">Grid Adaptation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#complete-input-file-example">Complete Input File Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Software Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#main-class-structure">Main Class Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#source-directory-structure">Source Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#multi-block-parallelization">Multi-Block Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#coupling-architecture">Coupling Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#build-system">Build System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#ci-cd">CI/CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_fortran.html">Fortran API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_fortran.html#key-modules">Key Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_doxygen.html">Doxygen API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_doxygen.html#source-files">Source Files</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HEGEL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Numerical Schemes</a></li>
+      <li class="breadcrumb-item active">Flux Schemes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/numerical_schemes/flux_schemes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="flux-schemes">
+<span id="id1"></span><h1>Flux Schemes<a class="headerlink" href="#flux-schemes" title="Link to this heading"></a></h1>
+<p>HEGEL provides a wide selection of inviscid (convective) numerical flux
+functions. All are selected at runtime via the <code class="docutils literal notranslate"><span class="pre">NUM_FLUX</span></code> input keyword.
+Viscous (diffusive) fluxes are always computed when a Navier-Stokes model is
+active and do not require a separate keyword.</p>
+<nav class="contents local" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#availability-matrix" id="id2">Availability Matrix</a></p></li>
+<li><p><a class="reference internal" href="#ausm-family" id="id3">AUSM Family</a></p>
+<ul>
+<li><p><a class="reference internal" href="#ausm-original" id="id4">AUSM (Original)</a></p></li>
+<li><p><a class="reference internal" href="#ausm" id="id5">AUSM+</a></p></li>
+<li><p><a class="reference internal" href="#ausm-up" id="id6">AUSM+-up</a></p></li>
+<li><p><a class="reference internal" href="#ausm-up2" id="id7">AUSM+-up2</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#roe-family" id="id8">Roe Family</a></p>
+<ul>
+<li><p><a class="reference internal" href="#roe-approximate-riemann-solver" id="id9">Roe Approximate Riemann Solver</a></p></li>
+<li><p><a class="reference internal" href="#preconditioned-roe-weiss-smith" id="id10">Preconditioned Roe (Weiss-Smith)</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#van-leer-flux-vector-splitting" id="id11">Van Leer Flux-Vector Splitting</a></p></li>
+<li><p><a class="reference internal" href="#hlle" id="id12">HLLE</a></p></li>
+<li><p><a class="reference internal" href="#steger-warming" id="id13">Steger-Warming</a></p></li>
+<li><p><a class="reference internal" href="#modified-steger-warming" id="id14">Modified Steger-Warming</a></p></li>
+<li><p><a class="reference internal" href="#lax-friedrichs" id="id15">Lax-Friedrichs</a></p></li>
+<li><p><a class="reference internal" href="#central-and-hybrid-schemes" id="id16">Central and Hybrid Schemes</a></p>
+<ul>
+<li><p><a class="reference internal" href="#skew-symmetric-ducros-central-flux" id="id17">Skew-Symmetric (Ducros) Central Flux</a></p></li>
+<li><p><a class="reference internal" href="#blended-upwind-central" id="id18">Blended Upwind-Central</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#flux-jacobian-approximations" id="id19">Flux Jacobian Approximations</a></p></li>
+</ul>
+</nav>
+<section id="availability-matrix">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Availability Matrix</a><a class="headerlink" href="#availability-matrix" title="Link to this heading"></a></h2>
+<p>Not every flux scheme is implemented in every fluid model. The table below
+shows which combinations are available.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 31.4%" />
+<col style="width: 11.4%" />
+<col style="width: 11.4%" />
+<col style="width: 11.4%" />
+<col style="width: 17.1%" />
+<col style="width: 17.1%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flux Scheme</p></th>
+<th class="head"><p>EU/NS</p></th>
+<th class="head"><p>LTE</p></th>
+<th class="head"><p>NLTE</p></th>
+<th class="head"><p>Exact Jacobian</p></th>
+<th class="head"><p>Entropy Fix</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AUSM</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AUSM_PLUS</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AUSM_PLUS_UP</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AUSM_PLUS_UP2</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROE</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>HH 1st</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROE_IPC_WS</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROE_VPC_WS</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">VAN_LEER</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SW</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MOD_SW</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HLLE</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LF</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p>Central/Hybrid</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+</tbody>
+</table>
+<p>Schemes without an exact Jacobian fall back to finite-difference (<code class="docutils literal notranslate"><span class="pre">FD</span></code>) or
+approximate (<code class="docutils literal notranslate"><span class="pre">JAMESON</span></code>, <code class="docutils literal notranslate"><span class="pre">POS_NEG_SPLIT</span></code>) Jacobians for implicit solvers.</p>
+</section>
+<section id="ausm-family">
+<span id="flux-ausm"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">AUSM Family</a><a class="headerlink" href="#ausm-family" title="Link to this heading"></a></h2>
+<p>The Advection Upstream Splitting Method (AUSM) family splits the numerical
+flux into convective (mass-flux) and pressure contributions, each computed
+independently.</p>
+<section id="ausm-original">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">AUSM (Original)</a><a class="headerlink" href="#ausm-original" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<p>M.-S. Liou, <em>J. Comput. Phys.</em> <strong>107</strong>, 23–39 (1993).</p>
+</div>
+<p>The original AUSM scheme splits the interface Mach number and pressure using
+polynomial functions of degree 1 and 2.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = AUSM
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_ausm.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_lte/EU_LTE_nflux_ausm.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_nflux_ausm.F90</span></code></p></li>
+</ul>
+<p><strong>Jacobian:</strong> Exact (<code class="docutils literal notranslate"><span class="pre">ausm_jac</span></code>).</p>
+</section>
+<section id="ausm">
+<span id="flux-ausm-plus"></span><h3><a class="toc-backref" href="#id5" role="doc-backlink">AUSM+</a><a class="headerlink" href="#ausm" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<p>M.-S. Liou, <em>J. Comput. Phys.</em> <strong>129</strong>, 364–382 (1996).</p>
+</div>
+<p>AUSM+ introduces 4th-degree polynomial splitting functions that guarantee
+positivity of the mass flux and exact resolution of isolated normal shocks.</p>
+<p>The interface Mach number and pressure are split independently:</p>
+<div class="math notranslate nohighlight">
+\[M_{1/2} = \mathcal{M}^+(M_L) + \mathcal{M}^-(M_R), \qquad
+p_{1/2} = \mathcal{P}^+(M_L)\,p_L + \mathcal{P}^-(M_R)\,p_R\]</div>
+<p>The numerical flux is then assembled as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}F_{1/2} = \dot{m}_{1/2}
+\begin{cases}
+  \Phi_L &amp; \text{if } \dot{m}_{1/2} \ge 0 \\
+  \Phi_R &amp; \text{otherwise}
+\end{cases}
++ p_{1/2} \hat{n}\end{split}\]</div>
+<p>where the mass flux includes the density:
+<span class="math notranslate nohighlight">\(\dot{m}_{1/2} = M_{1/2}\,\rho_\text{upw}\,c_{1/2}\)</span> (upwind density
+selected by the sign of <span class="math notranslate nohighlight">\(M_{1/2}\)</span>), and
+<span class="math notranslate nohighlight">\(\Phi = (1,\; u,\; v,\; [w],\; H)^T\)</span> is the vector of convected
+quantities. The interface speed of sound <span class="math notranslate nohighlight">\(c_{1/2}\)</span> is taken as the
+minimum of the left and right critical speeds of sound.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = AUSM_PLUS
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_ausm_plus.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/utils/utils_ausm.F90</span></code> (split functions: <code class="docutils literal notranslate"><span class="pre">get_inter_val_ausm_plus</span></code>)</p></li>
+</ul>
+<p><strong>Jacobian:</strong> Finite-difference only.</p>
+</section>
+<section id="ausm-up">
+<span id="flux-ausm-plus-up"></span><h3><a class="toc-backref" href="#id6" role="doc-backlink">AUSM+-up</a><a class="headerlink" href="#ausm-up" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<p>M.-S. Liou, <em>J. Comput. Phys.</em> <strong>214</strong>, 137–170 (2006).</p>
+</div>
+<p>AUSM+-up extends AUSM+ to all speed regimes by adding velocity and pressure
+diffusion terms scaled by the local Mach number:</p>
+<div class="math notranslate nohighlight">
+\[M_{1/2} = \mathcal{M}^+(M_L) + \mathcal{M}^-(M_R)
+- \frac{K_p}{f_a} \max\!\bigl(1 - \sigma\,\overline{M^2},\; 0\bigr)
+\frac{p_R - p_L}{\bar{\rho}\,\bar{c}^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\overline{M^2} = \tfrac{1}{2}(M_L^2 + M_R^2)\)</span>,
+<span class="math notranslate nohighlight">\(\bar{\rho} = \tfrac{1}{2}(\rho_L + \rho_R)\)</span>, and the scaling function
+<span class="math notranslate nohighlight">\(f_a = M_0(2 - M_0)\)</span> with
+<span class="math notranslate nohighlight">\(M_0 = \min\!\bigl(1,\;\max(\overline{M^2},\;M_\infty^2)\bigr)^{1/2}\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[p_{1/2} = \mathcal{P}^+(M_L)\,p_L + \mathcal{P}^-(M_R)\,p_R
+- K_u\,\mathcal{P}^+\mathcal{P}^-\,(\rho_L + \rho_R)\,(f_a\,\bar{c})\,(u_R - u_L)\]</div>
+<p>Default parameters: <span class="math notranslate nohighlight">\(K_p = 0.25\)</span>, <span class="math notranslate nohighlight">\(K_u = 0.75\)</span>, <span class="math notranslate nohighlight">\(\sigma = 1.0\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the pressure diffusion term, the code uses the <strong>sum</strong> of left and right
+densities <span class="math notranslate nohighlight">\((\rho_L + \rho_R)\)</span> (not the average <span class="math notranslate nohighlight">\(\bar{\rho}\)</span>)
+and multiplies by the scaling function <span class="math notranslate nohighlight">\(f_a\)</span>.</p>
+</div>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = AUSM_PLUS_UP
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_ausm_plus_up.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/utils/utils_ausm.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">get_inter_val_ausm_plus_up</span></code>)</p></li>
+</ul>
+<p><strong>Jacobian:</strong> Finite-difference only.</p>
+</section>
+<section id="ausm-up2">
+<span id="flux-ausm-plus-up2"></span><h3><a class="toc-backref" href="#id7" role="doc-backlink">AUSM+-up2</a><a class="headerlink" href="#ausm-up2" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="11">
+<li><p>Kitamura, E. Shima, <em>J. Comput. Phys.</em> <strong>245</strong>, 62–83 (2013).</p></li>
+</ol>
+</div>
+<p>AUSM+-up2 modifies the pressure flux to eliminate a numerical shock instability
+(carbuncle phenomenon) that can occur with AUSM+-up on high-aspect-ratio grids
+in hypersonic flow. The Mach number splitting is identical to AUSM+-up. The
+pressure flux uses a SLAU2-style formulation:</p>
+<div class="math notranslate nohighlight">
+\[p_{1/2} = \frac{1}{2}\Bigl[(p_L + p_R)
++ (\mathcal{P}^+ - \mathcal{P}^-)(p_L - p_R)\Bigr]
++ \sqrt{\overline{e_k}}\,
+(\mathcal{P}^+ + \mathcal{P}^- - 1)\,\bar{\rho}\,\bar{c}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\overline{e_k} = \tfrac{1}{2}(e_{k,L} + e_{k,R})\)</span> is the
+average specific kinetic energy, and the term
+<span class="math notranslate nohighlight">\((\mathcal{P}^+ + \mathcal{P}^- - 1)\)</span> acts as a pressure-velocity
+coupling that activates near shocks.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The AUSM+-up2 pressure term in HEGEL follows the SLAU2 formulation of
+Kitamura and Shima rather than a simple modification of the AUSM+-up
+pressure diffusion.</p>
+</div>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = AUSM_PLUS_UP2
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_ausm_plus_up2.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_nflux_ausm_plus_up2.F90</span></code></p></li>
+</ul>
+<p><strong>Jacobian:</strong> Finite-difference only.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not available for LTE models. Use <code class="docutils literal notranslate"><span class="pre">AUSM_PLUS_UP</span></code> instead.</p>
+</div>
+</section>
+</section>
+<section id="roe-family">
+<span id="flux-roe"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">Roe Family</a><a class="headerlink" href="#roe-family" title="Link to this heading"></a></h2>
+<section id="roe-approximate-riemann-solver">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Roe Approximate Riemann Solver</a><a class="headerlink" href="#roe-approximate-riemann-solver" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="16">
+<li><ol class="upperalpha simple" start="12">
+<li><p>Roe, <em>J. Comput. Phys.</em> <strong>43</strong>, 357–372 (1981).</p></li>
+</ol>
+</li>
+</ol>
+</div>
+<p>Roe’s method linearises the Riemann problem about a special averaged state
+(the Roe average) that satisfies the property
+<span class="math notranslate nohighlight">\(F_R - F_L = \hat{A}(U_R - U_L)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[F_{1/2} = \frac{1}{2}\bigl(F_L + F_R\bigr)
+- \frac{1}{2} \sum_{k=1}^{N} |\hat{\lambda}_k| \Delta \hat{w}_k \hat{r}_k\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{\lambda}_k\)</span>, <span class="math notranslate nohighlight">\(\hat{r}_k\)</span> are the eigenvalues and
+right eigenvectors of the Roe matrix, and <span class="math notranslate nohighlight">\(\Delta\hat{w}_k\)</span> are the wave
+strengths.</p>
+<p>An entropy fix (Harten-Hyman 1st order) is applied to prevent expansion
+shocks at sonic points. The 1st-order fix replaces eigenvalues that fall
+below a threshold with the threshold value itself:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}|\hat{\lambda}| \to
+\begin{cases}
+  \delta &amp; |\hat{\lambda}| &lt; \delta \\
+  |\hat{\lambda}| &amp; \text{otherwise}
+\end{cases}\end{split}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\delta = \max(0,\; \hat{\lambda} - \lambda_L,\; \lambda_R - \hat{\lambda})\)</span>.</p>
+<p>A 2nd-order variant (<code class="docutils literal notranslate"><span class="pre">HH_2nd_entropy_fix</span></code>) using the smooth quadratic
+formula <span class="math notranslate nohighlight">\((\hat{\lambda}^2 + \delta^2)/(2\delta)\)</span> is also available in
+the codebase but is not used by default.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = ROE
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_roe.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">roe_flux</span></code>, <code class="docutils literal notranslate"><span class="pre">roe_jac</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_roe_utils.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">roe_avg_state</span></code>, <code class="docutils literal notranslate"><span class="pre">roe_diss_term</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_nflux_roe.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/utils/utils_entropy_fix.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">HH_1st_entropy_fix</span></code>, <code class="docutils literal notranslate"><span class="pre">HH_2nd_entropy_fix</span></code>)</p></li>
+</ul>
+<p><strong>Jacobian:</strong> Exact (<code class="docutils literal notranslate"><span class="pre">roe_jac</span></code>).</p>
+</section>
+<section id="preconditioned-roe-weiss-smith">
+<span id="flux-roe-pc"></span><h3><a class="toc-backref" href="#id10" role="doc-backlink">Preconditioned Roe (Weiss-Smith)</a><a class="headerlink" href="#preconditioned-roe-weiss-smith" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="10">
+<li><ol class="upperalpha simple" start="13">
+<li><p>Weiss, W. A. Smith, <em>AIAA J.</em> <strong>33</strong>, 2050–2057 (1995).</p></li>
+</ol>
+</li>
+</ol>
+</div>
+<p>Low-Mach preconditioning modifies the dissipation term of the Roe flux using
+the Weiss-Smith preconditioning matrix <span class="math notranslate nohighlight">\(\Gamma\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[F_{1/2} = \frac{1}{2}(F_L + F_R) - \frac{1}{2}|\Gamma^{-1} A| (U_R - U_L)\]</div>
+<p>Two variants are available:</p>
+<ul class="simple">
+<li><p><strong>Inviscid preconditioning</strong> (<code class="docutils literal notranslate"><span class="pre">ROE_IPC_WS</span></code>): applies only to convective
+eigenvalues.</p></li>
+<li><p><strong>Viscous preconditioning</strong> (<code class="docutils literal notranslate"><span class="pre">ROE_VPC_WS</span></code>): also modifies the viscous
+time-step scaling.</p></li>
+</ul>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX       = ROE_IPC_WS   # or ROE_VPC_WS
+FLUID_M_INF    = 0.3          # reference Mach for preconditioning
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_roe_pc.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">roe_IPC_WS_flux</span></code>, <code class="docutils literal notranslate"><span class="pre">roe_VPC_WS_flux</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_roe_utils_pc.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">roe_WS_diss_term</span></code>)</p></li>
+</ul>
+<p><strong>Jacobian:</strong> Finite-difference only.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Only available for the EU/NS (calorically perfect gas) model. Not
+implemented for LTE or NLTE.</p>
+</div>
+<p>See also <a class="reference internal" href="preconditioning.html#preconditioning"><span class="std std-ref">Preconditioning</span></a>.</p>
+</section>
+</section>
+<section id="van-leer-flux-vector-splitting">
+<span id="flux-van-leer"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">Van Leer Flux-Vector Splitting</a><a class="headerlink" href="#van-leer-flux-vector-splitting" title="Link to this heading"></a></h2>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="2">
+<li><p>van Leer, <em>J. Comput. Phys.</em> <strong>32</strong>, 101–136 (1979).</p></li>
+</ol>
+</div>
+<p>The van Leer scheme splits the physical flux <span class="math notranslate nohighlight">\(F(U)\)</span> into forward
+(<span class="math notranslate nohighlight">\(F^+\)</span>) and backward (<span class="math notranslate nohighlight">\(F^-\)</span>) components based on the sign of the
+local Mach number.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = VAN_LEER
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_van_leer.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_lte/EU_LTE_nflux_van_leer.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_nflux_van_leer.F90</span></code></p></li>
+</ul>
+<p><strong>Jacobian:</strong> Exact (<code class="docutils literal notranslate"><span class="pre">van_leer_jac</span></code>).</p>
+</section>
+<section id="hlle">
+<span id="flux-hlle"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">HLLE</a><a class="headerlink" href="#hlle" title="Link to this heading"></a></h2>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="2">
+<li><p>Einfeldt et al., <em>J. Comput. Phys.</em> <strong>92</strong>, 273–295 (1991).</p></li>
+</ol>
+</div>
+<p>The HLLE scheme uses two-wave estimates for the bounding signal speeds
+<span class="math notranslate nohighlight">\(S_L, S_R\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[F_{1/2} = \frac{S_R F_L - S_L F_R + S_L S_R (U_R - U_L)}{S_R - S_L}\]</div>
+<p>Positivity-preserving but diffusive at contact discontinuities.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = HLLE
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_hlle.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_nflux_hlle.F90</span></code></p></li>
+</ul>
+<p><strong>Jacobian:</strong> Finite-difference only.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not available for LTE models.</p>
+</div>
+</section>
+<section id="steger-warming">
+<span id="flux-steger-warming"></span><h2><a class="toc-backref" href="#id13" role="doc-backlink">Steger-Warming</a><a class="headerlink" href="#steger-warming" title="Link to this heading"></a></h2>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="10">
+<li><ol class="upperalpha simple" start="12">
+<li><p>Steger, R. F. Warming, <em>J. Comput. Phys.</em> <strong>40</strong>, 263–293 (1981).</p></li>
+</ol>
+</li>
+</ol>
+</div>
+<p>Flux-vector splitting based on the homogeneity property <span class="math notranslate nohighlight">\(F = AU\)</span>.
+Conceptually the flux Jacobian is split as
+<span class="math notranslate nohighlight">\(A^\pm = R \Lambda^\pm R^{-1}\)</span>, giving <span class="math notranslate nohighlight">\(F_{1/2} = F^+(U_L) + F^-(U_R)\)</span>.
+The implementation computes the split fluxes directly from the eigenvalues
+<span class="math notranslate nohighlight">\(\lambda^\pm = \tfrac{1}{2}(\lambda \pm |\lambda|)\)</span> without forming the
+matrices <span class="math notranslate nohighlight">\(R\)</span>, <span class="math notranslate nohighlight">\(\Lambda\)</span>, <span class="math notranslate nohighlight">\(R^{-1}\)</span> explicitly.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = SW
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_steger_warming.F90</span></code></p>
+<p><strong>Jacobian:</strong> Finite-difference only.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only available for EU/NS model. Consider <code class="docutils literal notranslate"><span class="pre">MOD_SW</span></code> for reduced dissipation.</p>
+</div>
+</section>
+<section id="modified-steger-warming">
+<span id="flux-mod-steger-warming"></span><h2><a class="toc-backref" href="#id14" role="doc-backlink">Modified Steger-Warming</a><a class="headerlink" href="#modified-steger-warming" title="Link to this heading"></a></h2>
+<p>An improved variant of Steger-Warming with reduced numerical dissipation at
+contact discontinuities. Provides flux matrices <span class="math notranslate nohighlight">\(A^+, A^-\)</span> that can be
+used directly by characteristic-based reconstruction.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = MOD_SW
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_mod_steger_warming.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_nflux_mod_steger_warming.F90</span></code></p></li>
+</ul>
+<p><strong>Jacobian:</strong> Exact (<code class="docutils literal notranslate"><span class="pre">mod_steger_warming_flux_jac</span></code>).</p>
+</section>
+<section id="lax-friedrichs">
+<span id="flux-lax-friedrichs"></span><h2><a class="toc-backref" href="#id15" role="doc-backlink">Lax-Friedrichs</a><a class="headerlink" href="#lax-friedrichs" title="Link to this heading"></a></h2>
+<p>The simplest upwind-type flux, using the maximum local spectral radius over
+both left and right states,
+<span class="math notranslate nohighlight">\(\alpha = \max(|V_{n,L}| + c_L,\; |V_{n,R}| + c_R)\)</span>, as dissipation
+coefficient:</p>
+<div class="math notranslate nohighlight">
+\[F_{1/2} = \frac{1}{2}(F_L + F_R) - \frac{\alpha}{2}(U_R - U_L)\]</div>
+<p>Maximally diffusive. Useful as a baseline or for debugging.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = LF
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_lax_friedrichs.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_lte/EU_LTE_nflux_lax_friedrichs.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_nflux_lax_friedrichs.F90</span></code></p></li>
+</ul>
+<p><strong>Jacobian:</strong> Finite-difference only.</p>
+</section>
+<section id="central-and-hybrid-schemes">
+<span id="flux-hybrid"></span><h2><a class="toc-backref" href="#id16" role="doc-backlink">Central and Hybrid Schemes</a><a class="headerlink" href="#central-and-hybrid-schemes" title="Link to this heading"></a></h2>
+<section id="skew-symmetric-ducros-central-flux">
+<h3><a class="toc-backref" href="#id17" role="doc-backlink">Skew-Symmetric (Ducros) Central Flux</a><a class="headerlink" href="#skew-symmetric-ducros-central-flux" title="Link to this heading"></a></h3>
+<p>Non-dissipative, energy-conserving central fluxes based on the skew-symmetric
+formulation of Ducros et al. Available in 2nd and 4th order.</p>
+<p><strong>Input keywords:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = SKEW_SYM2       # 2nd-order, uniform grid
+NUM_FLUX = SKEW_SYM4       # 4th-order, uniform grid
+NUM_FLUX = SKEW_SYM2_NU    # 2nd-order, non-uniform grid
+NUM_FLUX = SKEW_SYM4_NU    # 4th-order, non-uniform grid
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_flux_skew_sym.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">skew_sym_flux2</span></code>, <code class="docutils literal notranslate"><span class="pre">skew_sym_flux4</span></code>, <code class="docutils literal notranslate"><span class="pre">skew_sym_flux_nu</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid/fluid_model_flux_central.F90</span></code> (dispatch wrapper)</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Pure central schemes are non-dissipative and will produce oscillations near
+discontinuities. Use the blended variant below for practical simulations.</p>
+</div>
+</section>
+<section id="blended-upwind-central">
+<h3><a class="toc-backref" href="#id18" role="doc-backlink">Blended Upwind-Central</a><a class="headerlink" href="#blended-upwind-central" title="Link to this heading"></a></h3>
+<p>Blends an upwind flux with a central (skew-symmetric) flux using a
+sensor-based parameter <span class="math notranslate nohighlight">\(\phi\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[F_{1/2} = \phi \, F_\text{central} + (1 - \phi) \, F_\text{upwind}\]</div>
+<p>The blending parameter is obtained from the Ducros shock sensor
+(<code class="docutils literal notranslate"><span class="pre">get_Phi_up_central</span></code>), which drives <span class="math notranslate nohighlight">\(\phi \to 0\)</span> near shocks
+(upwind) and <span class="math notranslate nohighlight">\(\phi \to 1\)</span> in smooth regions (central).</p>
+<p><strong>Input keywords:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX = BLEND_UP_SKEW_SYM2       # 2nd-order central component
+NUM_FLUX = BLEND_UP_SKEW_SYM4       # 4th-order central component
+NUM_FLUX = BLEND_UP_SKEW_SYM2_NU    # non-uniform grid variants
+NUM_FLUX = BLEND_UP_SKEW_SYM4_NU
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_central_upwind.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">upwind_central_flux</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_lte/EU_LTE_nflux_central_upwind.F90</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_nflux_central_upwind.F90</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="flux-jacobian-approximations">
+<h2><a class="toc-backref" href="#id19" role="doc-backlink">Flux Jacobian Approximations</a><a class="headerlink" href="#flux-jacobian-approximations" title="Link to this heading"></a></h2>
+<p>For implicit time integration, HEGEL requires the Jacobian
+<span class="math notranslate nohighlight">\(\partial F / \partial U\)</span> of the numerical flux. Three approximation
+strategies are available, selected via the <code class="docutils literal notranslate"><span class="pre">NUM_FLUX_JAC</span></code> keyword:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 30.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Method</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>(scheme-specific)</p></td>
+<td><p>Exact Jacobian</p></td>
+<td><p>Available for <code class="docutils literal notranslate"><span class="pre">ROE</span></code>, <code class="docutils literal notranslate"><span class="pre">AUSM</span></code>, <code class="docutils literal notranslate"><span class="pre">VAN_LEER</span></code>, <code class="docutils literal notranslate"><span class="pre">MOD_SW</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">JAMESON</span></code></p></td>
+<td><p>Jameson scalar dissipation</p></td>
+<td><p>Diagonal Jacobian; cheap but approximate</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POS_NEG_SPLIT</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(A^+/A^-\)</span> splitting</p></td>
+<td><p>Uses eigenvalue-based splitting of the flux Jacobian</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FD</span></code></p></td>
+<td><p>Finite difference</p></td>
+<td><p><span class="math notranslate nohighlight">\(\partial F/\partial U \approx [F(U+\epsilon) - F(U)]/\epsilon\)</span>, <span class="math notranslate nohighlight">\(\epsilon = 10^{-5}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_approx_jac.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">jameson_jac</span></code>, <code class="docutils literal notranslate"><span class="pre">pos_neg_split_jac</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_nflux_fd_jac.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">fd_jac</span></code>)</p></li>
+<li><p>Analogous files in <code class="docutils literal notranslate"><span class="pre">fluid_eu_ns_lte/</span></code> and <code class="docutils literal notranslate"><span class="pre">fluid_eu_ns_nlte/</span></code></p></li>
+</ul>
+<p><strong>Example (implicit with Jameson Jacobian):</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_FLUX     = AUSM_PLUS
+NUM_FLUX_JAC = JAMESON
+NUM_TIME_INT = BE
+NUM_LHS_JAC  = FULL
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Numerical Schemes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="time_integration.html" class="btn btn-neutral float-right" title="Time Integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alessandro Munafo, Marco Panesi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,717 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spatial Discretization &mdash; HEGEL 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script>window.MathJax = {"tex": {"macros": {"RR": "\\mathbb{R}", "vect": ["\\mathbf{#1}", 1], "pd": ["\\frac{\\partial #1}{\\partial #2}", 2]}}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Boundary Conditions" href="boundary_conditions.html" />
+    <link rel="prev" title="Time Integration" href="time_integration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            HEGEL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#required-packages">Required Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#building-petsc">Building PETSc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#building-hegel-with-autotools">Building HEGEL with Autotools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-1-bootstrap">Step 1: Bootstrap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-2-configure">Step 2: Configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-3-build-and-install">Step 3: Build and Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-4-environment-setup">Step 4: Environment Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#running-a-case">Running a Case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#running-hegel">Running HEGEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#available-test-cases">Available Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#configure-options-for-fluid-models">Configure Options for Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#optional-library-integration">Optional Library Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#typical-simulation-workflow">Typical Simulation Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#output-formats">Output Formats</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory &amp; Physics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#design-philosophy">Design Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#fluid-models">Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#multi-physics-coupling">Multi-Physics Coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#demonstrated-applications">Demonstrated Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../physics.html">Physics and Numerical Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#governing-equations">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#space-discretization">Space Discretization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#inviscid-flux">Inviscid Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#diffusive-flux">Diffusive Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#time-integration">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#grid-system">Grid System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#solution-strategy-for-steady-state-problems">Solution Strategy for Steady-State Problems</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Numerical Schemes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Numerical Schemes</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#quick-reference">Quick Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="flux_schemes.html">Flux Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#availability-matrix">Availability Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#ausm-family">AUSM Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#roe-family">Roe Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#van-leer-flux-vector-splitting">Van Leer Flux-Vector Splitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#hlle">HLLE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#steger-warming">Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#modified-steger-warming">Modified Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#lax-friedrichs">Lax-Friedrichs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#central-and-hybrid-schemes">Central and Hybrid Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#flux-jacobian-approximations">Flux Jacobian Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="time_integration.html">Time Integration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#explicit-methods">Explicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#implicit-methods">Implicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#run-modes-and-cfl-control">Run Modes and CFL Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#petsc-linear-solver-options">PETSc Linear Solver Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Spatial Discretization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reconstruction-procedures">Reconstruction Procedures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reconstruction-variable-sets">Reconstruction Variable Sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slope-limiters">Slope Limiters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reconstruction-availability-by-model">Reconstruction Availability by Model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="boundary_conditions.html">Boundary Conditions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#inviscid-euler-boundary-conditions">Inviscid (Euler) Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#subsonic-inlet-outlet">Subsonic Inlet / Outlet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#viscous-navier-stokes-wall-conditions">Viscous (Navier-Stokes) Wall Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#lodi-non-reflecting-boundary-conditions">LODI Non-Reflecting Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#internal-boundaries">Internal Boundaries</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_terms.html">Source Terms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#geometric-source-terms">Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#viscous-geometric-source-terms">Viscous Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#chemical-kinetics-source-terms">Chemical Kinetics Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#electromagnetic-source-terms">Electromagnetic Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#radiation-source-terms">Radiation Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#verification-source-terms">Verification Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#sponge-layers">Sponge Layers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="preconditioning.html">Preconditioning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#available-preconditioners">Available Preconditioners</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#weiss-smith-preconditioning">Weiss-Smith Preconditioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#input-settings">Input Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#compatibility">Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#grid-adaptation">Grid Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_reference.html">Input Parameter Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#fluid-model-selection">Fluid Model Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#numerical-flux">Numerical Flux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#reconstruction">Reconstruction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#time-integration">Time Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#linear-solver-petsc-ksp">Linear Solver (PETSc KSP)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#source-terms">Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#grid-adaptation">Grid Adaptation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#complete-input-file-example">Complete Input File Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Software Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#main-class-structure">Main Class Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#source-directory-structure">Source Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#multi-block-parallelization">Multi-Block Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#coupling-architecture">Coupling Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#build-system">Build System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#ci-cd">CI/CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_fortran.html">Fortran API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_fortran.html#key-modules">Key Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_doxygen.html">Doxygen API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_doxygen.html#source-files">Source Files</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HEGEL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Numerical Schemes</a></li>
+      <li class="breadcrumb-item active">Spatial Discretization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/numerical_schemes/spatial_discretization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="spatial-discretization">
+<span id="id1"></span><h1>Spatial Discretization<a class="headerlink" href="#spatial-discretization" title="Link to this heading"></a></h1>
+<p>HEGEL uses a cell-centered finite volume method on multi-block structured
+grids. High-order accuracy is achieved through reconstruction of interface
+states from cell-averaged values. This section documents all available
+reconstruction procedures, slope limiters, and reconstruction variable sets.</p>
+<nav class="contents local" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#reconstruction-procedures" id="id2">Reconstruction Procedures</a></p>
+<ul>
+<li><p><a class="reference internal" href="#piecewise-constant-const" id="id3">Piecewise Constant (CONST)</a></p></li>
+<li><p><a class="reference internal" href="#muscl" id="id4">MUSCL</a></p></li>
+<li><p><a class="reference internal" href="#weno3" id="id5">WENO3</a></p></li>
+<li><p><a class="reference internal" href="#weno5" id="id6">WENO5</a></p></li>
+<li><p><a class="reference internal" href="#mp3" id="id7">MP3</a></p></li>
+<li><p><a class="reference internal" href="#mp5" id="id8">MP5</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#reconstruction-variable-sets" id="id9">Reconstruction Variable Sets</a></p></li>
+<li><p><a class="reference internal" href="#slope-limiters" id="id10">Slope Limiters</a></p></li>
+<li><p><a class="reference internal" href="#reconstruction-availability-by-model" id="id11">Reconstruction Availability by Model</a></p></li>
+</ul>
+</nav>
+<section id="reconstruction-procedures">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Reconstruction Procedures</a><a class="headerlink" href="#reconstruction-procedures" title="Link to this heading"></a></h2>
+<p>The reconstruction procedure is selected via the <code class="docutils literal notranslate"><span class="pre">NUM_REC_PROC</span></code> keyword.
+The reconstruction variable set is selected via <code class="docutils literal notranslate"><span class="pre">NUM_REC_VAR</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 8.0%" />
+<col style="width: 8.0%" />
+<col style="width: 10.0%" />
+<col style="width: 59.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Order</p></th>
+<th class="head"><p>Stencil</p></th>
+<th class="head"><p>Limiting</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CONST</span></code></p></td>
+<td><p>1st</p></td>
+<td><p>2</p></td>
+<td><p>None</p></td>
+<td><p>Piecewise constant</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MUSCL</span></code></p></td>
+<td><p>2nd</p></td>
+<td><p>4</p></td>
+<td><p>Van Albada</p></td>
+<td><p>MUSCL with slope limiter</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MUSCL_NO_LIM</span></code></p></td>
+<td><p>2nd</p></td>
+<td><p>4</p></td>
+<td><p>None</p></td>
+<td><p>MUSCL without limiting (linear)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">WENO3</span></code></p></td>
+<td><p>3rd</p></td>
+<td><p>4</p></td>
+<td><p>WENO weights</p></td>
+<td><p>3rd-order WENO</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">WENO5</span></code></p></td>
+<td><p>5th</p></td>
+<td><p>6</p></td>
+<td><p>WENO weights</p></td>
+<td><p>5th-order WENO (Jiang-Shu)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">WENO3_NU</span></code></p></td>
+<td><p>3rd</p></td>
+<td><p>4</p></td>
+<td><p>WENO weights</p></td>
+<td><p>3rd-order WENO, non-uniform grids</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">WENO5_NU</span></code></p></td>
+<td><p>5th</p></td>
+<td><p>6</p></td>
+<td><p>WENO weights</p></td>
+<td><p>5th-order WENO, non-uniform grids</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MP3</span></code></p></td>
+<td><p>3rd</p></td>
+<td><p>4</p></td>
+<td><p>MP limiter</p></td>
+<td><p>Monotonicity-Preserving 3rd-order</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MP5</span></code></p></td>
+<td><p>5th</p></td>
+<td><p>6</p></td>
+<td><p>MP limiter</p></td>
+<td><p>Monotonicity-Preserving 5th-order</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Data constants:</strong> <code class="docutils literal notranslate"><span class="pre">src/data/data_rec_proc.F90</span></code></p>
+<section id="piecewise-constant-const">
+<span id="rec-const"></span><h3><a class="toc-backref" href="#id3" role="doc-backlink">Piecewise Constant (CONST)</a><a class="headerlink" href="#piecewise-constant-const" title="Link to this heading"></a></h3>
+<p>No reconstruction; left and right interface states are the cell averages
+themselves. First-order accurate. Robust but highly diffusive.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_REC_PROC = CONST
+</pre></div>
+</div>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_rec.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">no_rec</span></code>)</p>
+<p><strong>When to use:</strong> Low-Mach ICP flows, startup phase of complex chemistry
+simulations, debugging.</p>
+</section>
+<section id="muscl">
+<span id="rec-muscl"></span><h3><a class="toc-backref" href="#id4" role="doc-backlink">MUSCL</a><a class="headerlink" href="#muscl" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="2">
+<li><p>van Leer, <em>J. Comput. Phys.</em> <strong>32</strong>, 101–136 (1979).</p></li>
+</ol>
+</div>
+<p>Monotone Upstream-centered Schemes for Conservation Laws. Achieves 2nd-order
+accuracy using a 4-point stencil <span class="math notranslate nohighlight">\((i{-}1, i, i{+}1, i{+}2)\)</span> with a
+slope limiter to suppress oscillations near discontinuities.</p>
+<p>The implementation uses a <strong>two-argument</strong> form of the Van Albada limiter
+applied to forward and backward differences directly. The reconstructed
+left and right interface states are:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}q_{i+1/2}^L &amp;= q_i + \tfrac{1}{2}\,\psi(\Delta_+,\, \Delta_-,\, \epsilon) \\
+q_{i+1/2}^R &amp;= q_{i+1} - \tfrac{1}{2}\,\psi(\Delta_{++},\, \Delta_+,\, \epsilon)\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta_+ = q_{i+1} - q_i\)</span>, <span class="math notranslate nohighlight">\(\Delta_- = q_i - q_{i-1}\)</span>,
+<span class="math notranslate nohighlight">\(\Delta_{++} = q_{i+2} - q_{i+1}\)</span>, and the two-argument Van Albada
+function is:</p>
+<div class="math notranslate nohighlight">
+\[\psi(a, b, \epsilon) = \frac{(b^2 + \epsilon)\,a + (a^2 + \epsilon)\,b}
+{a^2 + b^2 + 2\epsilon}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\epsilon\)</span> is a small smoothing parameter to prevent division by
+zero.</p>
+<p><strong>Default limiter:</strong> Van Albada two-argument form (see <a class="reference internal" href="#limiters"><span class="std std-ref">Slope Limiters</span></a> below).</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_REC_PROC = MUSCL
+NUM_REC_VAR  = RHOVP    # or CHAR_RHOVP for characteristic MUSCL
+</pre></div>
+</div>
+<p><strong>Source files by model:</strong></p>
+<ul class="simple">
+<li><p>EU/NS: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_rec_muscl_rhovp.F90</span></code> (primitive), <code class="docutils literal notranslate"><span class="pre">EU_rec_muscl_char_rhovp.F90</span></code> (characteristic)</p></li>
+<li><p>LTE: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_lte/EU_LTE_rec_muscl_rhovp.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">EU_LTE_rec_muscl_rhovt.F90</span></code> (temperature-based)</p></li>
+<li><p>NLTE: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_rec_muscl.F90</span></code></p></li>
+<li><p>Core: <code class="docutils literal notranslate"><span class="pre">src/utils/utils_rec.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">muscl_rec</span></code>, <code class="docutils literal notranslate"><span class="pre">muscl_no_lim_rec</span></code>)</p></li>
+</ul>
+<p><strong>Positivity-preserving variants:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">muscl_rec_pos_pres</span></code> — enforces positivity of reconstructed density and pressure</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">muscl_rec_pos_pres_smooth(beta)</span></code> — smooth positivity enforcement with parameter <span class="math notranslate nohighlight">\(\beta\)</span></p></li>
+</ul>
+</section>
+<section id="weno3">
+<span id="rec-weno3"></span><h3><a class="toc-backref" href="#id5" role="doc-backlink">WENO3</a><a class="headerlink" href="#weno3" title="Link to this heading"></a></h3>
+<p>3rd-order Weighted Essentially Non-Oscillatory reconstruction using two
+candidate stencils, each producing a 2nd-order interpolant. The final
+reconstruction is a convex combination weighted by smoothness indicators:</p>
+<div class="math notranslate nohighlight">
+\[q_{i+1/2} = \sum_{k=0}^{1} \omega_k \, q^{(k)}_{i+1/2}\]</div>
+<p><strong>Optimal weights:</strong> <span class="math notranslate nohighlight">\(d_0 = 1/3\)</span>, <span class="math notranslate nohighlight">\(d_1 = 2/3\)</span>.</p>
+<p><strong>Smoothness parameter:</strong> <span class="math notranslate nohighlight">\(\epsilon_\text{WENO} = 10^{-6}\)</span>.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_REC_PROC = WENO3
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p>Core: <code class="docutils literal notranslate"><span class="pre">src/utils/utils_rec.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">weno3_rec</span></code>, <code class="docutils literal notranslate"><span class="pre">weno3_optim_rec</span></code>)</p></li>
+<li><p>EU/NS: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_rec_weno_rhovp.F90</span></code></p></li>
+</ul>
+</section>
+<section id="weno5">
+<span id="rec-weno5"></span><h3><a class="toc-backref" href="#id6" role="doc-backlink">WENO5</a><a class="headerlink" href="#weno5" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<p>G.-S. Jiang, C.-W. Shu, <em>J. Comput. Phys.</em> <strong>126</strong>, 202–228 (1996).</p>
+</div>
+<p>5th-order WENO reconstruction using three candidate stencils over a 6-point
+stencil <span class="math notranslate nohighlight">\((i{-}2, \ldots, i{+}3)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[q_{i+1/2} = \sum_{k=0}^{2} \omega_k \, q^{(k)}_{i+1/2}\]</div>
+<p><strong>Optimal weights:</strong> <span class="math notranslate nohighlight">\(d_0 = 0.1\)</span>, <span class="math notranslate nohighlight">\(d_1 = 0.6\)</span>, <span class="math notranslate nohighlight">\(d_2 = 0.3\)</span>.</p>
+<p><strong>Non-linear weights:</strong></p>
+<div class="math notranslate nohighlight">
+\[\omega_k = \frac{\alpha_k}{\sum_j \alpha_j}, \qquad
+\alpha_k = \frac{d_k}{(\epsilon + \beta_k)^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\beta_k\)</span> are the smoothness indicators computed from undivided
+differences.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_REC_PROC = WENO5
+NUM_REC_VAR  = CHAR_RHOVP   # characteristic recommended for shocks
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p>Core: <code class="docutils literal notranslate"><span class="pre">src/utils/utils_rec.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">weno5_rec</span></code>, <code class="docutils literal notranslate"><span class="pre">weno5_optim_rec</span></code>)</p></li>
+<li><p>EU/NS: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_rec_weno_rhovp.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">EU_rec_weno_char_rhovp.F90</span></code></p></li>
+<li><p>LTE: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_lte/EU_LTE_rec_weno.F90</span></code></p></li>
+<li><p>NLTE: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_rec_weno.F90</span></code></p></li>
+</ul>
+<p><strong>Non-uniform grid variant (WENO5_NU):</strong></p>
+<p>Uses divided differences for the smoothness indicators, automatically
+handling non-uniform cell spacing.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_REC_PROC = WENO5_NU
+</pre></div>
+</div>
+<p>Source: <code class="docutils literal notranslate"><span class="pre">src/utils/utils_rec.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">weno5_nu_rec</span></code>)</p>
+</section>
+<section id="mp3">
+<span id="rec-mp3"></span><h3><a class="toc-backref" href="#id7" role="doc-backlink">MP3</a><a class="headerlink" href="#mp3" title="Link to this heading"></a></h3>
+<p>3rd-order Monotonicity-Preserving reconstruction. Uses the same stencil as
+WENO3 but applies an <em>a posteriori</em> monotonicity constraint via the median
+operation:</p>
+<div class="math notranslate nohighlight">
+\[q_{i+1/2}^\text{MP} = \text{median}\bigl(q_i,\; q_{i+1/2}^\text{orig},\;
+q_\text{MP}\bigr)\]</div>
+<p><strong>Parameter:</strong> <span class="math notranslate nohighlight">\(\alpha_\text{MP} = 2.0\)</span> (controls curvature limiter).</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_REC_PROC = MP3
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p>Core: <code class="docutils literal notranslate"><span class="pre">src/utils/utils_rec.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">mp3_rec</span></code>)</p></li>
+<li><p>EU/NS: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_rec_mp_rhovp.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">EU_rec_mp_char_rhovp.F90</span></code></p></li>
+</ul>
+</section>
+<section id="mp5">
+<span id="rec-mp5"></span><h3><a class="toc-backref" href="#id8" role="doc-backlink">MP5</a><a class="headerlink" href="#mp5" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple">
+<li><p>Suresh, H. T. Huynh, <em>J. Comput. Phys.</em> <strong>136</strong>, 83–99 (1997).</p></li>
+</ol>
+</div>
+<p>5th-order Monotonicity-Preserving reconstruction. Achieves 5th-order accuracy
+in smooth regions while maintaining the monotonicity property near
+discontinuities. The unlimited 5th-order interpolant is:</p>
+<div class="math notranslate nohighlight">
+\[q_{i+1/2}^\text{orig} = \frac{1}{60}\bigl(2\,q_{i-2} - 13\,q_{i-1}
++ 47\,q_i + 27\,q_{i+1} - 3\,q_{i+2}\bigr)\]</div>
+<p>This is then constrained by the MP limiter using the median operation.</p>
+<p><strong>Parameter:</strong> <span class="math notranslate nohighlight">\(\alpha_\text{MP} = 2.0\)</span>.</p>
+<p><strong>Input:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NUM_REC_PROC = MP5
+NUM_REC_VAR  = RHOVP
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p>Core: <code class="docutils literal notranslate"><span class="pre">src/utils/utils_rec.F90</span></code> (<code class="docutils literal notranslate"><span class="pre">mp5_rec</span></code>)</p></li>
+<li><p>EU/NS: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_rec_mp_rhovp.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">EU_rec_mp_char_rhovp.F90</span></code></p></li>
+<li><p>LTE: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_lte/EU_LTE_rec_mp.F90</span></code></p></li>
+<li><p>NLTE: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/EU_NLTE_rec_mp.F90</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="reconstruction-variable-sets">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Reconstruction Variable Sets</a><a class="headerlink" href="#reconstruction-variable-sets" title="Link to this heading"></a></h2>
+<p>The choice of variables in which reconstruction is performed significantly
+affects the quality of the solution, especially near discontinuities.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 30.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Variables</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RHOVP</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho, u, v, [w], p)\)</span></p></td>
+<td><p>Default. Primitive variables.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CHAR_RHOVP</span></code></p></td>
+<td><p>Characteristic projection</p></td>
+<td><p>Projects to characteristic fields before limiting. Best for strong shocks.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RHOVT</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho, u, v, [w], T)\)</span></p></td>
+<td><p>LTE only. Temperature-based reconstruction.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Characteristic reconstruction</strong> (<code class="docutils literal notranslate"><span class="pre">CHAR_RHOVP</span></code>) projects the solution
+increments onto the eigenvectors of the flux Jacobian before applying the
+limiter, then projects back. This prevents spurious oscillations that arise
+when limiting different wave families (acoustic, entropy, shear)
+independently. Recommended when strong shocks or contact discontinuities are
+present.</p>
+<p><strong>Source files for eigensystem:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_eigsys.F90</span></code> (eigenvalues + left/right eigenvectors)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_transf_mat.F90</span></code> (transformation matrices)</p></li>
+</ul>
+<p><strong>NLTE variable sets:</strong></p>
+<p>For multi-species NLTE models, additional variable sets are available:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\((\rho_i, \mathbf{v}, T, T_k)\)</span> — species partial densities with temperatures</p></li>
+<li><p><span class="math notranslate nohighlight">\((\rho_i, \mathbf{v}, p, T_k)\)</span> — species densities with pressure and internal temperatures</p></li>
+</ul>
+</section>
+<section id="slope-limiters">
+<span id="limiters"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">Slope Limiters</a><a class="headerlink" href="#slope-limiters" title="Link to this heading"></a></h2>
+<p>Limiters are applied within the MUSCL reconstruction to prevent oscillations.
+All limiters are implemented as symmetric functions <span class="math notranslate nohighlight">\(\phi(r)\)</span> where
+<span class="math notranslate nohighlight">\(r\)</span> is the ratio of consecutive gradients.</p>
+<p><strong>Source file:</strong> <code class="docutils literal notranslate"><span class="pre">src/utils/utils_limiter.F90</span></code></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18.0%" />
+<col style="width: 40.0%" />
+<col style="width: 42.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Limiter</p></th>
+<th class="head"><p>Formula</p></th>
+<th class="head"><p>Properties</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Van Albada</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = \frac{r^2 + r}{r^2 + 1}\)</span></p></td>
+<td><p>Smooth; default in HEGEL</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Van Leer</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = \frac{r + |r|}{1 + |r|}\)</span></p></td>
+<td><p>Smooth; slightly more compressive</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Minmod</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = \max(0, \min(1, r))\)</span></p></td>
+<td><p>Most diffusive TVD limiter</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Superbee</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = \max(0, \min(2r,1), \min(r,2))\)</span></p></td>
+<td><p>Most compressive TVD limiter</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Koren</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = \max(0, \min(2r, (1+2r)/3, 2))\)</span></p></td>
+<td><p>3rd-order on uniform grids</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>MC</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = \max(0, \min(2r, (1+r)/2, 2))\)</span></p></td>
+<td><p>Monotonized central</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>CHARM</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = r(3r+1)/(r+1)^2\)</span></p></td>
+<td><p>Non-TVD; smooth</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>HCUS</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = 1.5(r+|r|)/(r+2)\)</span></p></td>
+<td><p>Non-TVD</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>HQUICK</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = 2(r+|r|)/(r+3)\)</span></p></td>
+<td><p>Non-TVD</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>OSPRE</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(\phi(r) = 1.5(r^2+r)/(r^2+r+1)\)</span></p></td>
+<td><p>Non-TVD; smooth</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The limiter is currently not independently selectable via the input file —
+MUSCL reconstruction uses Van Albada by default. The other limiters are
+available in the utility module for custom implementations.</p>
+</div>
+<p><strong>Helper functions</strong> (<code class="docutils literal notranslate"><span class="pre">src/utils/utils_rec.F90</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">van_Albada_two_arg(a,</span> <span class="pre">b,</span> <span class="pre">eps)</span></code> — two-argument form for direct use</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">minmod_two_arg(a,</span> <span class="pre">b)</span></code> — two-argument minmod</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">median(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> — three-value median (used by MP schemes)</p></li>
+</ul>
+</section>
+<section id="reconstruction-availability-by-model">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Reconstruction Availability by Model</a><a class="headerlink" href="#reconstruction-availability-by-model" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 15.0%" />
+<col style="width: 15.0%" />
+<col style="width: 15.0%" />
+<col style="width: 15.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Procedure</p></th>
+<th class="head"><p>EU/NS</p></th>
+<th class="head"><p>EU/NS (char)</p></th>
+<th class="head"><p>LTE</p></th>
+<th class="head"><p>NLTE</p></th>
+<th class="head"><p>NLTE (char)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CONST</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MUSCL</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">WENO3</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">WENO5</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MP3</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+<td><p>–</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MP5</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="time_integration.html" class="btn btn-neutral float-left" title="Time Integration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="boundary_conditions.html" class="btn btn-neutral float-right" title="Boundary Conditions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alessandro Munafo, Marco Panesi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

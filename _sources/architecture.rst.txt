@@ -1,0 +1,108 @@
+Software Architecture
+=====================
+
+HEGEL is written in modern Fortran 2008 and is designed in an object-oriented
+(OO) fashion. The code is parallelized using MPI and the data structures
+provided by the PETSc library to distribute data across processors.
+
+Main Class Structure
+--------------------
+
+The main class, ``solver``, contains all the principal user-defined
+types/classes:
+
+- ``sim_control`` — Stores options specified via the input file and runtime
+  information (e.g., interactive CFL number, time, number of iterations)
+- ``grid`` — Stores all grid-related information
+- ``grid_adapt`` and ``grid_refine`` — Allow for runtime grid modification
+  such as shock adaptation for blunt body simulations
+- ``physical_model`` — Contains all information related to the physics of the
+  problem (e.g., fluid model and corresponding field variables)
+- ``sol_init`` — Initializes the flowfield for common configurations such as
+  blunt bodies, jets, and nozzles
+- ``sol_post`` — Provides methods for solution post-processing
+- ``coupler`` — Responsible for data exchange with other solvers for
+  multi-physics simulations (compiled when ``HEGEL_HAVE_PRECICE`` is defined)
+- ``time_integrator`` — A polymorphic variable that handles the time
+  integration of the space-discretized equations. Being polymorphic, it can
+  reference different integrator types (explicit, implicit, IMEX)
+
+.. code-block:: fortran
+
+   type solver
+       private
+       type(sim_control)                    :: simulation
+       type(grid)                           :: mesh
+       type(grid_adapt)                     :: mesh_adapt
+       type(grid_refine)                    :: mesh_refine
+       type(physical_model)                 :: physics
+       type(sol_init)                       :: initializer
+       type(sol_post)                       :: post_processor
+   #ifdef HEGEL_HAVE_PRECICE
+       type(coupler)                        :: code_coupler
+   #endif
+       class(time_integrator), allocatable  :: integrator
+   contains
+       ! Type-bound procedures (methods)
+       ...
+   end type
+
+Source Directory Structure
+--------------------------
+
+The source code under ``src/`` is organized as follows:
+
+- ``main/`` — Program entry point and driver
+- ``fluid/`` — Core fluid solver infrastructure
+- ``fluid_eu_ns/`` — Euler/Navier-Stokes (calorically perfect gas)
+- ``fluid_eu_ns_lte/`` — Euler/Navier-Stokes with LTE thermochemistry
+- ``fluid_eu_ns_nlte/`` — Euler/Navier-Stokes with NLTE thermochemistry
+- ``fluid_icp_lte/`` — ICP with LTE thermochemistry
+- ``fluid_icp_nlte/`` — ICP with NLTE thermochemistry
+- ``grid/`` — Grid data structures and I/O
+- ``grid_gen/`` — Grid generation utilities
+- ``grid_adapt/`` — Grid adaptation (shock alignment)
+- ``grid_refine/`` — Grid refinement
+- ``field/`` — Field variable management
+- ``field_interp/`` — Field interpolation
+- ``sol_init/`` — Solution initialization
+- ``sol_post/`` — Solution post-processing and output
+- ``physics/`` — Physical models and gas properties
+- ``radiation/`` — Radiation transport
+- ``radiation_laser/`` — Laser radiation models
+- ``time_integrator/`` — Time integration schemes (explicit, implicit, IMEX)
+- ``sim_control/`` — Simulation parameters and control
+- ``coupler/`` — preCICE coupling interface
+- ``utils/`` — Utility routines
+- ``data/`` — Data files and tables
+
+Multi-Block Parallelization
+----------------------------
+
+For multi-block grids, parallelization proceeds as follows:
+
+1. At the start of a run, the global MPI communicator (``MPI_COMM_WORLD``)
+   is split into a series of ``block_comm`` communicators using
+   ``MPI_Comm_split``
+2. These communicators create the parallel layout of each grid block using
+   PETSc DM objects (``DMDACreate3d``)
+3. During the simulation, intra-block communication is realized via PETSc
+   (``DMGlobalToLocalBegin``/``End``), while inter-block communication is
+   handled by the ``grid_block_int`` class
+
+Coupling Architecture
+---------------------
+
+The ``coupler`` class manages data exchange with other solvers via preCICE.
+It contains two child classes:
+
+- ``coupler_surf`` — Methods for surface coupling (e.g., HEGEL ↔ PATO/CHyPS
+  at the material sample surface)
+- ``coupler_vol`` — Methods for volume coupling (e.g., HEGEL ↔ FLUX for
+  electromagnetic fields, HEGEL ↔ MURP for radiation transport)
+
+Build System
+------------
+
+HEGEL uses GNU Autotools (Autoconf/Automake/Libtool) as its primary
+build system. A CMake build is under development.

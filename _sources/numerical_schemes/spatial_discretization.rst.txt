@@ -1,0 +1,459 @@
+.. _spatial-discretization:
+
+=======================
+Spatial Discretization
+=======================
+
+HEGEL uses a cell-centered finite volume method on multi-block structured
+grids. High-order accuracy is achieved through reconstruction of interface
+states from cell-averaged values. This section documents all available
+reconstruction procedures, slope limiters, and reconstruction variable sets.
+
+.. contents:: On this page
+   :local:
+   :depth: 2
+
+
+Reconstruction Procedures
+=========================
+
+The reconstruction procedure is selected via the ``NUM_REC_PROC`` keyword.
+The reconstruction variable set is selected via ``NUM_REC_VAR``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 8 8 10 59
+
+   * - Keyword
+     - Order
+     - Stencil
+     - Limiting
+     - Description
+   * - ``CONST``
+     - 1st
+     - 2
+     - None
+     - Piecewise constant
+   * - ``MUSCL``
+     - 2nd
+     - 4
+     - Van Albada
+     - MUSCL with slope limiter
+   * - ``MUSCL_NO_LIM``
+     - 2nd
+     - 4
+     - None
+     - MUSCL without limiting (linear)
+   * - ``WENO3``
+     - 3rd
+     - 4
+     - WENO weights
+     - 3rd-order WENO
+   * - ``WENO5``
+     - 5th
+     - 6
+     - WENO weights
+     - 5th-order WENO (Jiang-Shu)
+   * - ``WENO3_NU``
+     - 3rd
+     - 4
+     - WENO weights
+     - 3rd-order WENO, non-uniform grids
+   * - ``WENO5_NU``
+     - 5th
+     - 6
+     - WENO weights
+     - 5th-order WENO, non-uniform grids
+   * - ``MP3``
+     - 3rd
+     - 4
+     - MP limiter
+     - Monotonicity-Preserving 3rd-order
+   * - ``MP5``
+     - 5th
+     - 6
+     - MP limiter
+     - Monotonicity-Preserving 5th-order
+
+**Data constants:** ``src/data/data_rec_proc.F90``
+
+
+.. _rec-const:
+
+Piecewise Constant (CONST)
+--------------------------
+
+No reconstruction; left and right interface states are the cell averages
+themselves. First-order accurate. Robust but highly diffusive.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_REC_PROC = CONST
+
+**Source files:** ``src/fluid_eu_ns/EU_rec.F90`` (``no_rec``)
+
+**When to use:** Low-Mach ICP flows, startup phase of complex chemistry
+simulations, debugging.
+
+
+.. _rec-muscl:
+
+MUSCL
+-----
+
+.. admonition:: Reference
+   :class: tip
+
+   B. van Leer, *J. Comput. Phys.* **32**, 101--136 (1979).
+
+Monotone Upstream-centered Schemes for Conservation Laws. Achieves 2nd-order
+accuracy using a 4-point stencil :math:`(i{-}1, i, i{+}1, i{+}2)` with a
+slope limiter to suppress oscillations near discontinuities.
+
+The implementation uses a **two-argument** form of the Van Albada limiter
+applied to forward and backward differences directly. The reconstructed
+left and right interface states are:
+
+.. math::
+
+   q_{i+1/2}^L &= q_i + \tfrac{1}{2}\,\psi(\Delta_+,\, \Delta_-,\, \epsilon) \\
+   q_{i+1/2}^R &= q_{i+1} - \tfrac{1}{2}\,\psi(\Delta_{++},\, \Delta_+,\, \epsilon)
+
+where :math:`\Delta_+ = q_{i+1} - q_i`, :math:`\Delta_- = q_i - q_{i-1}`,
+:math:`\Delta_{++} = q_{i+2} - q_{i+1}`, and the two-argument Van Albada
+function is:
+
+.. math::
+
+   \psi(a, b, \epsilon) = \frac{(b^2 + \epsilon)\,a + (a^2 + \epsilon)\,b}
+   {a^2 + b^2 + 2\epsilon}
+
+Here :math:`\epsilon` is a small smoothing parameter to prevent division by
+zero.
+
+**Default limiter:** Van Albada two-argument form (see :ref:`limiters` below).
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_REC_PROC = MUSCL
+   NUM_REC_VAR  = RHOVP    # or CHAR_RHOVP for characteristic MUSCL
+
+**Source files by model:**
+
+- EU/NS: ``src/fluid_eu_ns/EU_rec_muscl_rhovp.F90`` (primitive), ``EU_rec_muscl_char_rhovp.F90`` (characteristic)
+- LTE: ``src/fluid_eu_ns_lte/EU_LTE_rec_muscl_rhovp.F90``, ``EU_LTE_rec_muscl_rhovt.F90`` (temperature-based)
+- NLTE: ``src/fluid_eu_ns_nlte/EU_NLTE_rec_muscl.F90``
+- Core: ``src/utils/utils_rec.F90`` (``muscl_rec``, ``muscl_no_lim_rec``)
+
+**Positivity-preserving variants:**
+
+- ``muscl_rec_pos_pres`` --- enforces positivity of reconstructed density and pressure
+- ``muscl_rec_pos_pres_smooth(beta)`` --- smooth positivity enforcement with parameter :math:`\beta`
+
+
+.. _rec-weno3:
+
+WENO3
+-----
+
+3rd-order Weighted Essentially Non-Oscillatory reconstruction using two
+candidate stencils, each producing a 2nd-order interpolant. The final
+reconstruction is a convex combination weighted by smoothness indicators:
+
+.. math::
+
+   q_{i+1/2} = \sum_{k=0}^{1} \omega_k \, q^{(k)}_{i+1/2}
+
+**Optimal weights:** :math:`d_0 = 1/3`, :math:`d_1 = 2/3`.
+
+**Smoothness parameter:** :math:`\epsilon_\text{WENO} = 10^{-6}`.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_REC_PROC = WENO3
+
+**Source files:**
+
+- Core: ``src/utils/utils_rec.F90`` (``weno3_rec``, ``weno3_optim_rec``)
+- EU/NS: ``src/fluid_eu_ns/EU_rec_weno_rhovp.F90``
+
+.. _rec-weno5:
+
+WENO5
+-----
+
+.. admonition:: Reference
+   :class: tip
+
+   G.-S. Jiang, C.-W. Shu, *J. Comput. Phys.* **126**, 202--228 (1996).
+
+5th-order WENO reconstruction using three candidate stencils over a 6-point
+stencil :math:`(i{-}2, \ldots, i{+}3)`:
+
+.. math::
+
+   q_{i+1/2} = \sum_{k=0}^{2} \omega_k \, q^{(k)}_{i+1/2}
+
+**Optimal weights:** :math:`d_0 = 0.1`, :math:`d_1 = 0.6`, :math:`d_2 = 0.3`.
+
+**Non-linear weights:**
+
+.. math::
+
+   \omega_k = \frac{\alpha_k}{\sum_j \alpha_j}, \qquad
+   \alpha_k = \frac{d_k}{(\epsilon + \beta_k)^2}
+
+where :math:`\beta_k` are the smoothness indicators computed from undivided
+differences.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_REC_PROC = WENO5
+   NUM_REC_VAR  = CHAR_RHOVP   # characteristic recommended for shocks
+
+**Source files:**
+
+- Core: ``src/utils/utils_rec.F90`` (``weno5_rec``, ``weno5_optim_rec``)
+- EU/NS: ``src/fluid_eu_ns/EU_rec_weno_rhovp.F90``, ``EU_rec_weno_char_rhovp.F90``
+- LTE: ``src/fluid_eu_ns_lte/EU_LTE_rec_weno.F90``
+- NLTE: ``src/fluid_eu_ns_nlte/EU_NLTE_rec_weno.F90``
+
+**Non-uniform grid variant (WENO5_NU):**
+
+Uses divided differences for the smoothness indicators, automatically
+handling non-uniform cell spacing.
+
+.. code-block:: none
+
+   NUM_REC_PROC = WENO5_NU
+
+Source: ``src/utils/utils_rec.F90`` (``weno5_nu_rec``)
+
+
+.. _rec-mp3:
+
+MP3
+---
+
+3rd-order Monotonicity-Preserving reconstruction. Uses the same stencil as
+WENO3 but applies an *a posteriori* monotonicity constraint via the median
+operation:
+
+.. math::
+
+   q_{i+1/2}^\text{MP} = \text{median}\bigl(q_i,\; q_{i+1/2}^\text{orig},\;
+   q_\text{MP}\bigr)
+
+**Parameter:** :math:`\alpha_\text{MP} = 2.0` (controls curvature limiter).
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_REC_PROC = MP3
+
+**Source files:**
+
+- Core: ``src/utils/utils_rec.F90`` (``mp3_rec``)
+- EU/NS: ``src/fluid_eu_ns/EU_rec_mp_rhovp.F90``, ``EU_rec_mp_char_rhovp.F90``
+
+.. _rec-mp5:
+
+MP5
+---
+
+.. admonition:: Reference
+   :class: tip
+
+   A. Suresh, H. T. Huynh, *J. Comput. Phys.* **136**, 83--99 (1997).
+
+5th-order Monotonicity-Preserving reconstruction. Achieves 5th-order accuracy
+in smooth regions while maintaining the monotonicity property near
+discontinuities. The unlimited 5th-order interpolant is:
+
+.. math::
+
+   q_{i+1/2}^\text{orig} = \frac{1}{60}\bigl(2\,q_{i-2} - 13\,q_{i-1}
+   + 47\,q_i + 27\,q_{i+1} - 3\,q_{i+2}\bigr)
+
+This is then constrained by the MP limiter using the median operation.
+
+**Parameter:** :math:`\alpha_\text{MP} = 2.0`.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_REC_PROC = MP5
+   NUM_REC_VAR  = RHOVP
+
+**Source files:**
+
+- Core: ``src/utils/utils_rec.F90`` (``mp5_rec``)
+- EU/NS: ``src/fluid_eu_ns/EU_rec_mp_rhovp.F90``, ``EU_rec_mp_char_rhovp.F90``
+- LTE: ``src/fluid_eu_ns_lte/EU_LTE_rec_mp.F90``
+- NLTE: ``src/fluid_eu_ns_nlte/EU_NLTE_rec_mp.F90``
+
+
+Reconstruction Variable Sets
+=============================
+
+The choice of variables in which reconstruction is performed significantly
+affects the quality of the solution, especially near discontinuities.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 30 50
+
+   * - Keyword
+     - Variables
+     - Notes
+   * - ``RHOVP``
+     - :math:`(\rho, u, v, [w], p)`
+     - Default. Primitive variables.
+   * - ``CHAR_RHOVP``
+     - Characteristic projection
+     - Projects to characteristic fields before limiting. Best for strong shocks.
+   * - ``RHOVT``
+     - :math:`(\rho, u, v, [w], T)`
+     - LTE only. Temperature-based reconstruction.
+
+**Characteristic reconstruction** (``CHAR_RHOVP``) projects the solution
+increments onto the eigenvectors of the flux Jacobian before applying the
+limiter, then projects back. This prevents spurious oscillations that arise
+when limiting different wave families (acoustic, entropy, shear)
+independently. Recommended when strong shocks or contact discontinuities are
+present.
+
+**Source files for eigensystem:**
+
+- ``src/fluid_eu_ns/EU_eigsys.F90`` (eigenvalues + left/right eigenvectors)
+- ``src/fluid_eu_ns/EU_transf_mat.F90`` (transformation matrices)
+
+**NLTE variable sets:**
+
+For multi-species NLTE models, additional variable sets are available:
+
+- :math:`(\rho_i, \mathbf{v}, T, T_k)` --- species partial densities with temperatures
+- :math:`(\rho_i, \mathbf{v}, p, T_k)` --- species densities with pressure and internal temperatures
+
+
+.. _limiters:
+
+Slope Limiters
+==============
+
+Limiters are applied within the MUSCL reconstruction to prevent oscillations.
+All limiters are implemented as symmetric functions :math:`\phi(r)` where
+:math:`r` is the ratio of consecutive gradients.
+
+**Source file:** ``src/utils/utils_limiter.F90``
+
+.. list-table::
+   :header-rows: 1
+   :widths: 18 40 42
+
+   * - Limiter
+     - Formula
+     - Properties
+   * - **Van Albada**
+     - :math:`\phi(r) = \frac{r^2 + r}{r^2 + 1}`
+     - Smooth; default in HEGEL
+   * - **Van Leer**
+     - :math:`\phi(r) = \frac{r + |r|}{1 + |r|}`
+     - Smooth; slightly more compressive
+   * - **Minmod**
+     - :math:`\phi(r) = \max(0, \min(1, r))`
+     - Most diffusive TVD limiter
+   * - **Superbee**
+     - :math:`\phi(r) = \max(0, \min(2r,1), \min(r,2))`
+     - Most compressive TVD limiter
+   * - **Koren**
+     - :math:`\phi(r) = \max(0, \min(2r, (1+2r)/3, 2))`
+     - 3rd-order on uniform grids
+   * - **MC**
+     - :math:`\phi(r) = \max(0, \min(2r, (1+r)/2, 2))`
+     - Monotonized central
+   * - **CHARM**
+     - :math:`\phi(r) = r(3r+1)/(r+1)^2`
+     - Non-TVD; smooth
+   * - **HCUS**
+     - :math:`\phi(r) = 1.5(r+|r|)/(r+2)`
+     - Non-TVD
+   * - **HQUICK**
+     - :math:`\phi(r) = 2(r+|r|)/(r+3)`
+     - Non-TVD
+   * - **OSPRE**
+     - :math:`\phi(r) = 1.5(r^2+r)/(r^2+r+1)`
+     - Non-TVD; smooth
+
+.. note::
+
+   The limiter is currently not independently selectable via the input file ---
+   MUSCL reconstruction uses Van Albada by default. The other limiters are
+   available in the utility module for custom implementations.
+
+**Helper functions** (``src/utils/utils_rec.F90``):
+
+- ``van_Albada_two_arg(a, b, eps)`` --- two-argument form for direct use
+- ``minmod_two_arg(a, b)`` --- two-argument minmod
+- ``median(x, y, z)`` --- three-value median (used by MP schemes)
+
+
+Reconstruction Availability by Model
+=====================================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 15 15 15 15 25
+
+   * - Procedure
+     - EU/NS
+     - EU/NS (char)
+     - LTE
+     - NLTE
+     - NLTE (char)
+   * - ``CONST``
+     - Yes
+     - --
+     - Yes
+     - Yes
+     - --
+   * - ``MUSCL``
+     - Yes
+     - Yes
+     - Yes
+     - Yes
+     - --
+   * - ``WENO3``
+     - Yes
+     - Yes
+     - --
+     - --
+     - --
+   * - ``WENO5``
+     - Yes
+     - Yes
+     - Yes
+     - Yes
+     - Yes
+   * - ``MP3``
+     - Yes
+     - Yes
+     - --
+     - --
+     - --
+   * - ``MP5``
+     - Yes
+     - Yes
+     - Yes
+     - Yes
+     - Yes

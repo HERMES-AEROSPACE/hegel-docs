@@ -1,0 +1,835 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boundary Conditions &mdash; HEGEL 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script>window.MathJax = {"tex": {"macros": {"RR": "\\mathbb{R}", "vect": ["\\mathbf{#1}", 1], "pd": ["\\frac{\\partial #1}{\\partial #2}", 2]}}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Source Terms" href="source_terms.html" />
+    <link rel="prev" title="Spatial Discretization" href="spatial_discretization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            HEGEL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#required-packages">Required Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#building-petsc">Building PETSc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#building-hegel-with-autotools">Building HEGEL with Autotools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-1-bootstrap">Step 1: Bootstrap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-2-configure">Step 2: Configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-3-build-and-install">Step 3: Build and Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-4-environment-setup">Step 4: Environment Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#running-a-case">Running a Case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#running-hegel">Running HEGEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#available-test-cases">Available Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#configure-options-for-fluid-models">Configure Options for Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#optional-library-integration">Optional Library Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#typical-simulation-workflow">Typical Simulation Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#output-formats">Output Formats</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory &amp; Physics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#design-philosophy">Design Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#fluid-models">Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#multi-physics-coupling">Multi-Physics Coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#demonstrated-applications">Demonstrated Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../physics.html">Physics and Numerical Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#governing-equations">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#space-discretization">Space Discretization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#inviscid-flux">Inviscid Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#diffusive-flux">Diffusive Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#time-integration">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#grid-system">Grid System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#solution-strategy-for-steady-state-problems">Solution Strategy for Steady-State Problems</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Numerical Schemes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Numerical Schemes</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#quick-reference">Quick Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="flux_schemes.html">Flux Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#availability-matrix">Availability Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#ausm-family">AUSM Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#roe-family">Roe Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#van-leer-flux-vector-splitting">Van Leer Flux-Vector Splitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#hlle">HLLE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#steger-warming">Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#modified-steger-warming">Modified Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#lax-friedrichs">Lax-Friedrichs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#central-and-hybrid-schemes">Central and Hybrid Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#flux-jacobian-approximations">Flux Jacobian Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="time_integration.html">Time Integration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#explicit-methods">Explicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#implicit-methods">Implicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#run-modes-and-cfl-control">Run Modes and CFL Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#petsc-linear-solver-options">PETSc Linear Solver Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_discretization.html">Spatial Discretization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-procedures">Reconstruction Procedures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-variable-sets">Reconstruction Variable Sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#slope-limiters">Slope Limiters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-availability-by-model">Reconstruction Availability by Model</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Boundary Conditions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inviscid-euler-boundary-conditions">Inviscid (Euler) Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#subsonic-inlet-outlet">Subsonic Inlet / Outlet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#viscous-navier-stokes-wall-conditions">Viscous (Navier-Stokes) Wall Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lodi-non-reflecting-boundary-conditions">LODI Non-Reflecting Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#internal-boundaries">Internal Boundaries</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_terms.html">Source Terms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#geometric-source-terms">Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#viscous-geometric-source-terms">Viscous Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#chemical-kinetics-source-terms">Chemical Kinetics Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#electromagnetic-source-terms">Electromagnetic Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#radiation-source-terms">Radiation Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#verification-source-terms">Verification Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#sponge-layers">Sponge Layers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="preconditioning.html">Preconditioning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#available-preconditioners">Available Preconditioners</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#weiss-smith-preconditioning">Weiss-Smith Preconditioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#input-settings">Input Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#compatibility">Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#grid-adaptation">Grid Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_reference.html">Input Parameter Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#fluid-model-selection">Fluid Model Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#numerical-flux">Numerical Flux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#reconstruction">Reconstruction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#time-integration">Time Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#linear-solver-petsc-ksp">Linear Solver (PETSc KSP)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#source-terms">Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#grid-adaptation">Grid Adaptation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#complete-input-file-example">Complete Input File Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_reference.html#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Software Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#main-class-structure">Main Class Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#source-directory-structure">Source Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#multi-block-parallelization">Multi-Block Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#coupling-architecture">Coupling Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#build-system">Build System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#ci-cd">CI/CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_fortran.html">Fortran API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_fortran.html#key-modules">Key Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_doxygen.html">Doxygen API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_doxygen.html#source-files">Source Files</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HEGEL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Numerical Schemes</a></li>
+      <li class="breadcrumb-item active">Boundary Conditions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/numerical_schemes/boundary_conditions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="boundary-conditions">
+<span id="id1"></span><h1>Boundary Conditions<a class="headerlink" href="#boundary-conditions" title="Link to this heading"></a></h1>
+<p>HEGEL supports a comprehensive set of boundary conditions for inviscid
+(Euler) and viscous (Navier-Stokes) flows. Boundary conditions are specified
+in a separate BC file referenced from the main input file.</p>
+<nav class="contents local" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#summary" id="id2">Summary</a></p></li>
+<li><p><a class="reference internal" href="#inviscid-euler-boundary-conditions" id="id3">Inviscid (Euler) Boundary Conditions</a></p>
+<ul>
+<li><p><a class="reference internal" href="#symmetry-slip-wall" id="id4">Symmetry / Slip Wall</a></p></li>
+<li><p><a class="reference internal" href="#farfield" id="id5">Farfield</a></p></li>
+<li><p><a class="reference internal" href="#supersonic-inlet-outlet" id="id6">Supersonic Inlet / Outlet</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#subsonic-inlet-outlet" id="id7">Subsonic Inlet / Outlet</a></p>
+<ul>
+<li><p><a class="reference internal" href="#subsonic-inlet-static-conditions" id="id8">Subsonic Inlet (Static Conditions)</a></p></li>
+<li><p><a class="reference internal" href="#subsonic-inlet-total-conditions" id="id9">Subsonic Inlet (Total Conditions)</a></p></li>
+<li><p><a class="reference internal" href="#subsonic-inlet-mass-flow-rate" id="id10">Subsonic Inlet (Mass Flow Rate)</a></p></li>
+<li><p><a class="reference internal" href="#subsonic-outlet" id="id11">Subsonic Outlet</a></p></li>
+<li><p><a class="reference internal" href="#ambivalent-inlet-outlet" id="id12">Ambivalent Inlet/Outlet</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#viscous-navier-stokes-wall-conditions" id="id13">Viscous (Navier-Stokes) Wall Conditions</a></p>
+<ul>
+<li><p><a class="reference internal" href="#isothermal-no-slip-wall" id="id14">Isothermal No-Slip Wall</a></p></li>
+<li><p><a class="reference internal" href="#adiabatic-no-slip-wall" id="id15">Adiabatic No-Slip Wall</a></p></li>
+<li><p><a class="reference internal" href="#isothermal-wall-with-gas-surface-interactions-nlte" id="id16">Isothermal Wall with Gas-Surface Interactions (NLTE)</a></p></li>
+<li><p><a class="reference internal" href="#mixed-isothermal-adiabatic-wall-nlte" id="id17">Mixed Isothermal/Adiabatic Wall (NLTE)</a></p></li>
+<li><p><a class="reference internal" href="#moving-adiabatic-wall" id="id18">Moving Adiabatic Wall</a></p></li>
+<li><p><a class="reference internal" href="#blowing-wall-mass-injection" id="id19">Blowing Wall (Mass Injection)</a></p></li>
+<li><p><a class="reference internal" href="#radiative-equilibrium-wall" id="id20">Radiative Equilibrium Wall</a></p></li>
+<li><p><a class="reference internal" href="#radiative-equilibrium-wall-with-gsi-nlte" id="id21">Radiative Equilibrium Wall with GSI (NLTE)</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#lodi-non-reflecting-boundary-conditions" id="id22">LODI Non-Reflecting Boundary Conditions</a></p>
+<ul>
+<li><p><a class="reference internal" href="#lodi-parameters" id="id23">LODI Parameters</a></p></li>
+<li><p><a class="reference internal" href="#lodi-inlet-and-outlet" id="id24">LODI Inlet and Outlet</a></p></li>
+<li><p><a class="reference internal" href="#lodi-corner-edge-conditions" id="id25">LODI Corner/Edge Conditions</a></p></li>
+<li><p><a class="reference internal" href="#non-lodi-corner-edge-conditions" id="id26">Non-LODI Corner/Edge Conditions</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#internal-boundaries" id="id27">Internal Boundaries</a></p>
+<ul>
+<li><p><a class="reference internal" href="#block-interface" id="id28">Block Interface</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="summary">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Summary</a><a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 8.0%" />
+<col style="width: 15.0%" />
+<col style="width: 52.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>ID</p></th>
+<th class="head"><p>Applies To</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SYMMETRY</span></code></p></td>
+<td><p>1</p></td>
+<td><p>EU/NS</p></td>
+<td><p>Slip wall / symmetry plane</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NO_SLIP_WALL_ISO</span></code></p></td>
+<td><p>2</p></td>
+<td><p>NS</p></td>
+<td><p>Isothermal no-slip wall</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NO_SLIP_WALL_ISO_GSI</span></code></p></td>
+<td><p>3</p></td>
+<td><p>NS (NLTE)</p></td>
+<td><p>Isothermal wall with gas-surface interactions</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NO_SLIP_WALL_AD</span></code></p></td>
+<td><p>4</p></td>
+<td><p>NS</p></td>
+<td><p>Adiabatic no-slip wall</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MOV_NO_SLIP_WALL_AD</span></code></p></td>
+<td><p>5</p></td>
+<td><p>NS</p></td>
+<td><p>Moving adiabatic wall</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NO_SLIP_RAD_EQ_WALL</span></code></p></td>
+<td><p>6</p></td>
+<td><p>NS</p></td>
+<td><p>Radiative equilibrium wall</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NO_SLIP_RAD_EQ_WALL_GSI</span></code></p></td>
+<td><p>7</p></td>
+<td><p>NS (NLTE)</p></td>
+<td><p>Radiative equilibrium wall with GSI</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BLOW_WALL</span></code></p></td>
+<td><p>8</p></td>
+<td><p>NS</p></td>
+<td><p>Blowing (mass injection) wall</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NO_SLIP_WALL_AD_TINT</span></code></p></td>
+<td><p>9</p></td>
+<td><p>NS (NLTE)</p></td>
+<td><p>Isothermal/adiabatic mixed-mode wall</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FARFIELD</span></code></p></td>
+<td><p>10</p></td>
+<td><p>EU</p></td>
+<td><p>Characteristic-based farfield</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN</span></code></p></td>
+<td><p>20</p></td>
+<td><p>EU/NS</p></td>
+<td><p>Subsonic inlet (static P, T)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN_TOT</span></code></p></td>
+<td><p>21</p></td>
+<td><p>EU/NS</p></td>
+<td><p>Subsonic inlet (total P0, T0)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN_MDOT</span></code></p></td>
+<td><p>22</p></td>
+<td><p>EU/NS</p></td>
+<td><p>Subsonic inlet (mass flow rate)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_OUT</span></code></p></td>
+<td><p>23</p></td>
+<td><p>EU/NS</p></td>
+<td><p>Subsonic outlet (static P)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN_OUT</span></code></p></td>
+<td><p>24</p></td>
+<td><p>NS</p></td>
+<td><p>Ambivalent inlet/outlet</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SUP_IN</span></code></p></td>
+<td><p>30</p></td>
+<td><p>EU/NS</p></td>
+<td><p>Supersonic inlet (all specified)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUP_OUT</span></code></p></td>
+<td><p>31</p></td>
+<td><p>EU/NS</p></td>
+<td><p>Supersonic outlet (all extrapolated)</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Data constants:</strong> <code class="docutils literal notranslate"><span class="pre">src/data/data_bc_proc.F90</span></code></p>
+</section>
+<section id="inviscid-euler-boundary-conditions">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Inviscid (Euler) Boundary Conditions</a><a class="headerlink" href="#inviscid-euler-boundary-conditions" title="Link to this heading"></a></h2>
+<section id="symmetry-slip-wall">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Symmetry / Slip Wall</a><a class="headerlink" href="#symmetry-slip-wall" title="Link to this heading"></a></h3>
+<p>Reflects the normal velocity component while preserving tangential components
+and thermodynamic state. Used for symmetry planes and inviscid walls.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = SYMMETRY
+</pre></div>
+</div>
+<p>No parameters required.</p>
+</section>
+<section id="farfield">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Farfield</a><a class="headerlink" href="#farfield" title="Link to this heading"></a></h3>
+<p>Characteristic-based treatment for farfield boundaries. Incoming
+characteristics are set from freestream conditions; outgoing characteristics
+are extrapolated from the interior.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = FARFIELD
+</pre></div>
+</div>
+<p><strong>Parameters:</strong> Freestream density, velocity, pressure.</p>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_bc_face_farfield.F90</span></code></p>
+</section>
+<section id="supersonic-inlet-outlet">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Supersonic Inlet / Outlet</a><a class="headerlink" href="#supersonic-inlet-outlet" title="Link to this heading"></a></h3>
+<p>At a <strong>supersonic inlet</strong>, all characteristics enter the domain — all flow
+variables are specified from boundary data:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = SUP_IN
+</pre></div>
+</div>
+<p>At a <strong>supersonic outlet</strong>, all characteristics leave the domain —
+all variables are extrapolated (zero-gradient):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = SUP_OUT
+</pre></div>
+</div>
+</section>
+</section>
+<section id="subsonic-inlet-outlet">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Subsonic Inlet / Outlet</a><a class="headerlink" href="#subsonic-inlet-outlet" title="Link to this heading"></a></h2>
+<section id="subsonic-inlet-static-conditions">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Subsonic Inlet (Static Conditions)</a><a class="headerlink" href="#subsonic-inlet-static-conditions" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="4">
+<li><ol class="upperalpha simple" start="12">
+<li><p>Whitfield, J. M. Janus, <em>AIAA Paper 84-1552</em> (1984).</p></li>
+</ol>
+</li>
+</ol>
+</div>
+<p>Imposes static pressure and temperature. Density extrapolated from interior.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = SUB_IN
+P       = 101325.0
+T       = 300.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_bc_face_in.F90</span></code></p>
+</section>
+<section id="subsonic-inlet-total-conditions">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Subsonic Inlet (Total Conditions)</a><a class="headerlink" href="#subsonic-inlet-total-conditions" title="Link to this heading"></a></h3>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="10">
+<li><ol class="upperalpha simple" start="18">
+<li><p>Carlson, <em>NASA/TM-2011-217181</em> (2011).</p></li>
+</ol>
+</li>
+</ol>
+</div>
+<p>Imposes total (stagnation) pressure and temperature. Flow direction derived
+from interior characteristics.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = SUB_IN_TOT
+P0      = 200000.0
+T0      = 500.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_bc_face_in_tot.F90</span></code></p>
+</section>
+<section id="subsonic-inlet-mass-flow-rate">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Subsonic Inlet (Mass Flow Rate)</a><a class="headerlink" href="#subsonic-inlet-mass-flow-rate" title="Link to this heading"></a></h3>
+<p>Imposes mass flow rate and temperature. Useful for combustor and ICP torch
+inlets.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE  = SUB_IN_MDOT
+MDOT     = 0.5
+T        = 300.0
+</pre></div>
+</div>
+<p>For multi-species (NLTE): additional <code class="docutils literal notranslate"><span class="pre">RHOI</span></code> or <code class="docutils literal notranslate"><span class="pre">XI</span></code> parameters specify
+species composition.</p>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_bc_face_in_mdot.F90</span></code></p>
+</section>
+<section id="subsonic-outlet">
+<h3><a class="toc-backref" href="#id11" role="doc-backlink">Subsonic Outlet</a><a class="headerlink" href="#subsonic-outlet" title="Link to this heading"></a></h3>
+<p>Imposes static back-pressure; all other quantities extrapolated from interior.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = SUB_OUT
+P       = 101325.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_bc_face_out.F90</span></code></p>
+</section>
+<section id="ambivalent-inlet-outlet">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">Ambivalent Inlet/Outlet</a><a class="headerlink" href="#ambivalent-inlet-outlet" title="Link to this heading"></a></h3>
+<p>Dynamically switches between inlet and outlet behaviour based on local flow
+direction. Useful when the flow direction at the boundary is not known
+<em>a priori</em> (e.g., separated regions).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = SUB_IN_OUT
+P0      = 200000.0
+T0      = 500.0
+P       = 101325.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_bc_face_in_out.F90</span></code></p>
+</section>
+</section>
+<section id="viscous-navier-stokes-wall-conditions">
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Viscous (Navier-Stokes) Wall Conditions</a><a class="headerlink" href="#viscous-navier-stokes-wall-conditions" title="Link to this heading"></a></h2>
+<section id="isothermal-no-slip-wall">
+<h3><a class="toc-backref" href="#id14" role="doc-backlink">Isothermal No-Slip Wall</a><a class="headerlink" href="#isothermal-no-slip-wall" title="Link to this heading"></a></h3>
+<p>Velocity set to zero; wall temperature specified; pressure extrapolated.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = NO_SLIP_WALL_ISO
+T       = 300.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/NS_bc_face_wall_iso.F90</span></code></p>
+</section>
+<section id="adiabatic-no-slip-wall">
+<h3><a class="toc-backref" href="#id15" role="doc-backlink">Adiabatic No-Slip Wall</a><a class="headerlink" href="#adiabatic-no-slip-wall" title="Link to this heading"></a></h3>
+<p>Velocity set to zero; zero heat flux at wall. Temperature recovers to the
+adiabatic wall temperature.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = NO_SLIP_WALL_AD
+</pre></div>
+</div>
+<p>No additional parameters.</p>
+</section>
+<section id="isothermal-wall-with-gas-surface-interactions-nlte">
+<h3><a class="toc-backref" href="#id16" role="doc-backlink">Isothermal Wall with Gas-Surface Interactions (NLTE)</a><a class="headerlink" href="#isothermal-wall-with-gas-surface-interactions-nlte" title="Link to this heading"></a></h3>
+<p>No-slip wall with catalytic surface reactions. Species composition at the
+wall is determined by surface chemistry. Requires NLTE fluid model.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = NO_SLIP_WALL_ISO_GSI
+T       = 1500.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/NS_NLTE_bc_face_wall_iso_gsi.F90</span></code></p>
+</section>
+<section id="mixed-isothermal-adiabatic-wall-nlte">
+<h3><a class="toc-backref" href="#id17" role="doc-backlink">Mixed Isothermal/Adiabatic Wall (NLTE)</a><a class="headerlink" href="#mixed-isothermal-adiabatic-wall-nlte" title="Link to this heading"></a></h3>
+<p>Translational temperature set to wall value (isothermal); vibrational and
+electronic temperatures set to adiabatic recovery. Decouples temperature
+modes at the wall.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = NO_SLIP_WALL_AD_TINT
+T       = 1000.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/NS_NLTE_bc_face_wall_iso_ad.F90</span></code></p>
+</section>
+<section id="moving-adiabatic-wall">
+<h3><a class="toc-backref" href="#id18" role="doc-backlink">Moving Adiabatic Wall</a><a class="headerlink" href="#moving-adiabatic-wall" title="Link to this heading"></a></h3>
+<p>No-slip wall with prescribed wall velocity.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = MOV_NO_SLIP_WALL_AD
+VEL     = 100.0  0.0  0.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/NS_bc_face_wall_mov.F90</span></code></p>
+</section>
+<section id="blowing-wall-mass-injection">
+<h3><a class="toc-backref" href="#id19" role="doc-backlink">Blowing Wall (Mass Injection)</a><a class="headerlink" href="#blowing-wall-mass-injection" title="Link to this heading"></a></h3>
+<p>Wall with prescribed normal velocity (transpiration). Used for ablation
+modelling and film cooling.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = BLOW_WALL
+VEL     = 0.0  0.1  0.0
+T       = 2000.0
+</pre></div>
+</div>
+<p>For NLTE: add species composition with <code class="docutils literal notranslate"><span class="pre">RHOI</span></code> or <code class="docutils literal notranslate"><span class="pre">XI</span></code>.</p>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/NS_bc_face_wall_blow.F90</span></code></p>
+</section>
+<section id="radiative-equilibrium-wall">
+<h3><a class="toc-backref" href="#id20" role="doc-backlink">Radiative Equilibrium Wall</a><a class="headerlink" href="#radiative-equilibrium-wall" title="Link to this heading"></a></h3>
+<p>Wall temperature determined by the balance between conductive heat flux to
+the wall and radiative emission:</p>
+<div class="math notranslate nohighlight">
+\[q_\text{cond} = \epsilon \sigma (T_w^4 - T_\text{ext}^4)\]</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE  = NO_SLIP_RAD_EQ_WALL
+EMIS     = 0.85
+TEMP_EXT = 300.0
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/NS_bc_face_wall_rad_eq.F90</span></code></p>
+</section>
+<section id="radiative-equilibrium-wall-with-gsi-nlte">
+<h3><a class="toc-backref" href="#id21" role="doc-backlink">Radiative Equilibrium Wall with GSI (NLTE)</a><a class="headerlink" href="#radiative-equilibrium-wall-with-gsi-nlte" title="Link to this heading"></a></h3>
+<p>Combines radiative equilibrium temperature with catalytic surface chemistry.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE  = NO_SLIP_RAD_EQ_WALL_GSI
+EMIS     = 0.85
+</pre></div>
+</div>
+<p><strong>Source:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_nlte/NS_NLTE_bc_face_wall_rad_eq_gsi.F90</span></code></p>
+</section>
+</section>
+<section id="lodi-non-reflecting-boundary-conditions">
+<span id="lodi-bcs"></span><h2><a class="toc-backref" href="#id22" role="doc-backlink">LODI Non-Reflecting Boundary Conditions</a><a class="headerlink" href="#lodi-non-reflecting-boundary-conditions" title="Link to this heading"></a></h2>
+<div class="tip admonition">
+<p class="admonition-title">Reference</p>
+<ol class="upperalpha simple" start="5">
+<li><p>Motheau, Y. Mery, F. Nicoud, T. Poinsot, <em>AIAA J.</em> <strong>55</strong> (10), 2017.</p></li>
+</ol>
+<ol class="upperalpha simple" start="11">
+<li><ol class="upperalpha simple" start="23">
+<li><p>Thompson, <em>J. Comput. Phys.</em> <strong>68</strong>, 1–24 (1987).</p></li>
+</ol>
+</li>
+</ol>
+</div>
+<p>The LODI (Locally One-Dimensional Inviscid) approach uses characteristic
+decomposition to construct non-reflecting boundary conditions. Ghost-cell
+values are set such that incoming wave amplitudes are relaxed toward target
+conditions while outgoing waves pass freely.</p>
+<p>LODI boundary conditions are essential for subsonic problems where spurious
+wave reflections from boundaries contaminate the interior solution (e.g., jet
+simulations, acoustic problems, unsteady flows).</p>
+<section id="lodi-parameters">
+<h3><a class="toc-backref" href="#id23" role="doc-backlink">LODI Parameters</a><a class="headerlink" href="#lodi-parameters" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 15.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SIGMA</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Relaxation coefficient for incoming characteristics</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LREF</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Reference length (domain size in normal direction)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BETA</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Relaxation coefficient (compressible waves)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BETA_VIS</span></code></p></td>
+<td><p>–</p></td>
+<td><p>Relaxation coefficient (viscous/transverse terms)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="lodi-inlet-and-outlet">
+<h3><a class="toc-backref" href="#id24" role="doc-backlink">LODI Inlet and Outlet</a><a class="headerlink" href="#lodi-inlet-and-outlet" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 8.0%" />
+<col style="width: 67.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>ID</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN_LODI</span></code></p></td>
+<td><p>-10</p></td>
+<td><p>Subsonic inlet with LODI (1D/2D)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN_TOT_LODI</span></code></p></td>
+<td><p>-11</p></td>
+<td><p>Subsonic inlet with total conditions (LODI)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_OUT_LODI</span></code></p></td>
+<td><p>-12</p></td>
+<td><p>Subsonic outlet with LODI (1D/2D)</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example (non-reflecting outlet):</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = SUB_OUT_LODI
+P       = 101325.0
+SIGMA   = 0.25
+LREF    = 0.1
+BETA    = 0.5
+</pre></div>
+</div>
+<p><strong>Source files:</strong></p>
+<ul class="simple">
+<li><p>1D: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_bc_lodi_face_1d_in.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">EU_bc_lodi_face_1d_out.F90</span></code></p></li>
+<li><p>2D: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/EU_bc_lodi_face_2d_in.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">EU_bc_lodi_face_2d_out.F90</span></code></p></li>
+<li><p>NS: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/NS_bc_lodi_face_2d_in.F90</span></code>, <code class="docutils literal notranslate"><span class="pre">NS_bc_lodi_face_2d_out.F90</span></code></p></li>
+<li><p>LTE: <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns_lte/NS_LTE_bc_lodi_face_2d_*.F90</span></code></p></li>
+<li><p>Utility: <code class="docutils literal notranslate"><span class="pre">src/utils/utils_bc_lodi.F90</span></code></p></li>
+</ul>
+</section>
+<section id="lodi-corner-edge-conditions">
+<h3><a class="toc-backref" href="#id25" role="doc-backlink">LODI Corner/Edge Conditions</a><a class="headerlink" href="#lodi-corner-edge-conditions" title="Link to this heading"></a></h3>
+<p>Where two LODI boundaries meet, special corner (2D) or edge (3D) treatments
+are needed:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 8.0%" />
+<col style="width: 62.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>ID</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN_LODI_WALL_GC</span></code></p></td>
+<td><p>-1</p></td>
+<td><p>Inlet + isothermal wall corner</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN_LODI_SYM_GC</span></code></p></td>
+<td><p>-2</p></td>
+<td><p>Inlet + symmetry corner</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_IN_OUT_LODI_GC</span></code></p></td>
+<td><p>-3</p></td>
+<td><p>Inlet + outlet corner</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_OUT_LODI_GC</span></code></p></td>
+<td><p>-4</p></td>
+<td><p>Outlet + outlet corner</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_OUT_LODI_WALL_GC</span></code></p></td>
+<td><p>-5</p></td>
+<td><p>Outlet + isothermal wall corner</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SUB_OUT_LODI_SYM_GC</span></code></p></td>
+<td><p>-6</p></td>
+<td><p>Outlet + symmetry corner</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source files:</strong> <code class="docutils literal notranslate"><span class="pre">src/fluid_eu_ns/NS_bc_lodi_corner_2d_*.F90</span></code></p>
+</section>
+<section id="non-lodi-corner-edge-conditions">
+<h3><a class="toc-backref" href="#id26" role="doc-backlink">Non-LODI Corner/Edge Conditions</a><a class="headerlink" href="#non-lodi-corner-edge-conditions" title="Link to this heading"></a></h3>
+<p>Standard (non-LODI) ghost-cell treatments for 2D corners and 3D edges:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 8.0%" />
+<col style="width: 67.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>ID</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IN_SYM_GC</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Inlet + symmetry corner</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IN_WALL_GC</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Inlet + wall corner</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IN_OUT_GC</span></code></p></td>
+<td><p>2</p></td>
+<td><p>Inlet + outlet corner</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OUT_GC</span></code></p></td>
+<td><p>3</p></td>
+<td><p>Outlet + outlet corner</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">OUT_SYM_GC</span></code></p></td>
+<td><p>4</p></td>
+<td><p>Outlet + symmetry corner</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OUT_WALL_GC</span></code></p></td>
+<td><p>5</p></td>
+<td><p>Outlet + wall corner</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">WALL_SYM_GC</span></code></p></td>
+<td><p>6</p></td>
+<td><p>Wall + symmetry corner</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">WALL_GC</span></code></p></td>
+<td><p>7</p></td>
+<td><p>Wall + wall corner</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SYM_GC</span></code></p></td>
+<td><p>8</p></td>
+<td><p>Symmetry + symmetry corner</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="internal-boundaries">
+<h2><a class="toc-backref" href="#id27" role="doc-backlink">Internal Boundaries</a><a class="headerlink" href="#internal-boundaries" title="Link to this heading"></a></h2>
+<section id="block-interface">
+<h3><a class="toc-backref" href="#id28" role="doc-backlink">Block Interface</a><a class="headerlink" href="#block-interface" title="Link to this heading"></a></h3>
+<p>Internal boundary between computational blocks in a multi-block grid.
+Handled automatically by the grid module — not set by the user.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>BC_TYPE = BLOCK_INTERFACE   # ID = -200
+</pre></div>
+</div>
+<p>Ghost cell data is exchanged via MPI for inter-processor block interfaces.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="spatial_discretization.html" class="btn btn-neutral float-left" title="Spatial Discretization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="source_terms.html" class="btn btn-neutral float-right" title="Source Terms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alessandro Munafo, Marco Panesi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

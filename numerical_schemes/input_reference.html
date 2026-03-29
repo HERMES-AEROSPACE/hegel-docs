@@ -1,0 +1,774 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input Parameter Reference &mdash; HEGEL 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script>window.MathJax = {"tex": {"macros": {"RR": "\\mathbb{R}", "vect": ["\\mathbf{#1}", 1], "pd": ["\\frac{\\partial #1}{\\partial #2}", 2]}}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Software Architecture" href="../architecture.html" />
+    <link rel="prev" title="Preconditioning" href="preconditioning.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            HEGEL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#required-packages">Required Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#building-petsc">Building PETSc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#building-hegel-with-autotools">Building HEGEL with Autotools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-1-bootstrap">Step 1: Bootstrap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-2-configure">Step 2: Configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-3-build-and-install">Step 3: Build and Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started.html#step-4-environment-setup">Step 4: Environment Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#running-a-case">Running a Case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#running-hegel">Running HEGEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#available-test-cases">Available Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#configure-options-for-fluid-models">Configure Options for Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#optional-library-integration">Optional Library Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#typical-simulation-workflow">Typical Simulation Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#output-formats">Output Formats</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory &amp; Physics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#design-philosophy">Design Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#fluid-models">Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#multi-physics-coupling">Multi-Physics Coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#demonstrated-applications">Demonstrated Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../physics.html">Physics and Numerical Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#governing-equations">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#space-discretization">Space Discretization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#inviscid-flux">Inviscid Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#diffusive-flux">Diffusive Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../physics.html#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#time-integration">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#grid-system">Grid System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../physics.html#solution-strategy-for-steady-state-problems">Solution Strategy for Steady-State Problems</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Numerical Schemes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Numerical Schemes</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#quick-reference">Quick Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="flux_schemes.html">Flux Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#availability-matrix">Availability Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#ausm-family">AUSM Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#roe-family">Roe Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#van-leer-flux-vector-splitting">Van Leer Flux-Vector Splitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#hlle">HLLE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#steger-warming">Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#modified-steger-warming">Modified Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#lax-friedrichs">Lax-Friedrichs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#central-and-hybrid-schemes">Central and Hybrid Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flux_schemes.html#flux-jacobian-approximations">Flux Jacobian Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="time_integration.html">Time Integration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#explicit-methods">Explicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#implicit-methods">Implicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#run-modes-and-cfl-control">Run Modes and CFL Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="time_integration.html#petsc-linear-solver-options">PETSc Linear Solver Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spatial_discretization.html">Spatial Discretization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-procedures">Reconstruction Procedures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-variable-sets">Reconstruction Variable Sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#slope-limiters">Slope Limiters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spatial_discretization.html#reconstruction-availability-by-model">Reconstruction Availability by Model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="boundary_conditions.html">Boundary Conditions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#inviscid-euler-boundary-conditions">Inviscid (Euler) Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#subsonic-inlet-outlet">Subsonic Inlet / Outlet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#viscous-navier-stokes-wall-conditions">Viscous (Navier-Stokes) Wall Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#lodi-non-reflecting-boundary-conditions">LODI Non-Reflecting Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="boundary_conditions.html#internal-boundaries">Internal Boundaries</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_terms.html">Source Terms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#geometric-source-terms">Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#viscous-geometric-source-terms">Viscous Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#chemical-kinetics-source-terms">Chemical Kinetics Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#electromagnetic-source-terms">Electromagnetic Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#radiation-source-terms">Radiation Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#verification-source-terms">Verification Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_terms.html#sponge-layers">Sponge Layers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="preconditioning.html">Preconditioning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#available-preconditioners">Available Preconditioners</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#weiss-smith-preconditioning">Weiss-Smith Preconditioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#input-settings">Input Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#compatibility">Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preconditioning.html#grid-adaptation">Grid Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Input Parameter Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fluid-model-selection">Fluid Model Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#numerical-flux">Numerical Flux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reconstruction">Reconstruction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#time-integration">Time Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linear-solver-petsc-ksp">Linear Solver (PETSc KSP)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#source-terms">Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grid-adaptation">Grid Adaptation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#complete-input-file-example">Complete Input File Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Software Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#main-class-structure">Main Class Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#source-directory-structure">Source Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#multi-block-parallelization">Multi-Block Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#coupling-architecture">Coupling Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#build-system">Build System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#ci-cd">CI/CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../development.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_fortran.html">Fortran API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_fortran.html#key-modules">Key Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_doxygen.html">Doxygen API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_doxygen.html#source-files">Source Files</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HEGEL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Numerical Schemes</a></li>
+      <li class="breadcrumb-item active">Input Parameter Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/numerical_schemes/input_reference.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="input-parameter-reference">
+<span id="input-reference"></span><h1>Input Parameter Reference<a class="headerlink" href="#input-parameter-reference" title="Link to this heading"></a></h1>
+<p>This section provides a complete reference of all input parameters related to
+numerical scheme selection and configuration in HEGEL.</p>
+<nav class="contents local" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#fluid-model-selection" id="id1">Fluid Model Selection</a></p></li>
+<li><p><a class="reference internal" href="#numerical-flux" id="id2">Numerical Flux</a></p></li>
+<li><p><a class="reference internal" href="#reconstruction" id="id3">Reconstruction</a></p></li>
+<li><p><a class="reference internal" href="#time-integration" id="id4">Time Integration</a></p></li>
+<li><p><a class="reference internal" href="#dual-time-stepping" id="id5">Dual-Time Stepping</a></p></li>
+<li><p><a class="reference internal" href="#linear-solver-petsc-ksp" id="id6">Linear Solver (PETSc KSP)</a></p></li>
+<li><p><a class="reference internal" href="#source-terms" id="id7">Source Terms</a></p></li>
+<li><p><a class="reference internal" href="#grid-adaptation" id="id8">Grid Adaptation</a></p></li>
+<li><p><a class="reference internal" href="#complete-input-file-example" id="id9">Complete Input File Example</a></p></li>
+<li><p><a class="reference internal" href="#test-coverage" id="id10">Test Coverage</a></p></li>
+</ul>
+</nav>
+<section id="fluid-model-selection">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Fluid Model Selection</a><a class="headerlink" href="#fluid-model-selection" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 15.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FLUID_MODEL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">EU</span></code>, <code class="docutils literal notranslate"><span class="pre">NS</span></code>, <code class="docutils literal notranslate"><span class="pre">EU_LTE</span></code>, <code class="docutils literal notranslate"><span class="pre">NS_LTE</span></code>, <code class="docutils literal notranslate"><span class="pre">EU_NLTE</span></code>, <code class="docutils literal notranslate"><span class="pre">NS_NLTE</span></code>, <code class="docutils literal notranslate"><span class="pre">ICP_LTE</span></code>, <code class="docutils literal notranslate"><span class="pre">ICP_NLTE</span></code></p></td>
+<td><p>Fluid model selection. <code class="docutils literal notranslate"><span class="pre">EU</span></code> = Euler (inviscid), <code class="docutils literal notranslate"><span class="pre">NS</span></code> = Navier-Stokes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FLUID_GAMMA</span></code></p></td>
+<td><p>real</p></td>
+<td><p>Ratio of specific heats <span class="math notranslate nohighlight">\(\gamma\)</span> (EU/NS only)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FLUID_R</span></code></p></td>
+<td><p>real</p></td>
+<td><p>Specific gas constant [J/(kg K)] (EU/NS only)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FLUID_M_INF</span></code></p></td>
+<td><p>real</p></td>
+<td><p>Freestream Mach number (also used for preconditioning)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="numerical-flux">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Numerical Flux</a><a class="headerlink" href="#numerical-flux" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Valid Values</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_FLUX</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ROE</span></code>, <code class="docutils literal notranslate"><span class="pre">AUSM</span></code>, <code class="docutils literal notranslate"><span class="pre">AUSM_PLUS</span></code>, <code class="docutils literal notranslate"><span class="pre">AUSM_PLUS_UP</span></code>, <code class="docutils literal notranslate"><span class="pre">AUSM_PLUS_UP2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">VAN_LEER</span></code>, <code class="docutils literal notranslate"><span class="pre">HLLE</span></code>, <code class="docutils literal notranslate"><span class="pre">SW</span></code>, <code class="docutils literal notranslate"><span class="pre">MOD_SW</span></code>, <code class="docutils literal notranslate"><span class="pre">LF</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ROE_IPC_WS</span></code>, <code class="docutils literal notranslate"><span class="pre">ROE_VPC_WS</span></code>,
+<code class="docutils literal notranslate"><span class="pre">SKEW_SYM2</span></code>, <code class="docutils literal notranslate"><span class="pre">SKEW_SYM4</span></code>, <code class="docutils literal notranslate"><span class="pre">SKEW_SYM2_NU</span></code>, <code class="docutils literal notranslate"><span class="pre">SKEW_SYM4_NU</span></code>,
+<code class="docutils literal notranslate"><span class="pre">BLEND_UP_SKEW_SYM2</span></code>, <code class="docutils literal notranslate"><span class="pre">BLEND_UP_SKEW_SYM4</span></code>,
+<code class="docutils literal notranslate"><span class="pre">BLEND_UP_SKEW_SYM2_NU</span></code>, <code class="docutils literal notranslate"><span class="pre">BLEND_UP_SKEW_SYM4_NU</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_FLUX_JAC</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">JAMESON</span></code>, <code class="docutils literal notranslate"><span class="pre">POS_NEG_SPLIT</span></code>, <code class="docutils literal notranslate"><span class="pre">FD</span></code>, or scheme-specific exact Jacobian (<code class="docutils literal notranslate"><span class="pre">ROE</span></code>)</p></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="flux_schemes.html#flux-schemes"><span class="std std-ref">Flux Schemes</span></a> for detailed descriptions.</p>
+</section>
+<section id="reconstruction">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Reconstruction</a><a class="headerlink" href="#reconstruction" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Valid Values</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_REC_PROC</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CONST</span></code>, <code class="docutils literal notranslate"><span class="pre">MUSCL</span></code>, <code class="docutils literal notranslate"><span class="pre">MUSCL_NO_LIM</span></code>, <code class="docutils literal notranslate"><span class="pre">WENO3</span></code>, <code class="docutils literal notranslate"><span class="pre">WENO5</span></code>,
+<code class="docutils literal notranslate"><span class="pre">WENO3_NU</span></code>, <code class="docutils literal notranslate"><span class="pre">WENO5_NU</span></code>, <code class="docutils literal notranslate"><span class="pre">MP3</span></code>, <code class="docutils literal notranslate"><span class="pre">MP5</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_REC_VAR</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RHOVP</span></code>, <code class="docutils literal notranslate"><span class="pre">CHAR_RHOVP</span></code>, <code class="docutils literal notranslate"><span class="pre">RHOVT</span></code> (LTE only)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_SLOPE_LIM</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">VAN_ALBADA</span></code> (default; other limiters available in source)</p></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="spatial_discretization.html#spatial-discretization"><span class="std std-ref">Spatial Discretization</span></a> for detailed descriptions.</p>
+</section>
+<section id="time-integration">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Time Integration</a><a class="headerlink" href="#time-integration" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Valid Values / Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_TIME_INT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FE</span></code>, <code class="docutils literal notranslate"><span class="pre">RK2</span></code>, <code class="docutils literal notranslate"><span class="pre">RK4</span></code>, <code class="docutils literal notranslate"><span class="pre">RK_LS</span></code>, <code class="docutils literal notranslate"><span class="pre">RK_LS_PI</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RK2_SSP</span></code>, <code class="docutils literal notranslate"><span class="pre">RK3_SSP</span></code>, <code class="docutils literal notranslate"><span class="pre">RK2_TVD</span></code>, <code class="docutils literal notranslate"><span class="pre">RK3_TVD</span></code>,
+<code class="docutils literal notranslate"><span class="pre">STRANG</span></code>, <code class="docutils literal notranslate"><span class="pre">OS</span></code>, <code class="docutils literal notranslate"><span class="pre">BE</span></code>, <code class="docutils literal notranslate"><span class="pre">3PB</span></code>, <code class="docutils literal notranslate"><span class="pre">CN</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_RUN_MODE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CONSTANT_CFL</span></code>, <code class="docutils literal notranslate"><span class="pre">CONSTANT_DT</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_CFL</span></code></p></td>
+<td><p>CFL number (real)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_VNN</span></code></p></td>
+<td><p>Von Neumann number (real)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DT</span></code></p></td>
+<td><p>Global time step [s] (for <code class="docutils literal notranslate"><span class="pre">CONSTANT_DT</span></code> mode)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LHS_JAC</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FULL</span></code>, <code class="docutils literal notranslate"><span class="pre">DIAG</span></code>, <code class="docutils literal notranslate"><span class="pre">DPLR</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_JAC_UPDATE_RATE</span></code></p></td>
+<td><p>Update Jacobian every N iterations (integer)</p></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="time_integration.html#time-integration"><span class="std std-ref">Time Integration</span></a> for detailed descriptions.</p>
+</section>
+<section id="dual-time-stepping">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Dual-Time Stepping</a><a class="headerlink" href="#dual-time-stepping" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 65.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">T</span></code> / <code class="docutils literal notranslate"><span class="pre">F</span></code> — enable dual-time stepping</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_MAX_IT</span></code></p></td>
+<td><p>Maximum sub-iterations per physical time step</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_RES</span></code></p></td>
+<td><p>Convergence threshold (residual L2 norm)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_WRMS_LIM</span></code></p></td>
+<td><p>Convergence threshold (WRMS error)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_WRMS_RTOL</span></code></p></td>
+<td><p>Relative tolerance for WRMS convergence test</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_DUAL_TIME_WRMS_ATOL</span></code></p></td>
+<td><p>Absolute tolerance for WRMS convergence test</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="linear-solver-petsc-ksp">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Linear Solver (PETSc KSP)</a><a class="headerlink" href="#linear-solver-petsc-ksp" title="Link to this heading"></a></h2>
+<p>These parameters control the iterative linear solver when
+<code class="docutils literal notranslate"><span class="pre">NUM_LHS_JAC</span> <span class="pre">=</span> <span class="pre">FULL</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_ALG</span></code></p></td>
+<td><p>KSP algorithm (e.g., <code class="docutils literal notranslate"><span class="pre">GMRES</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_PC</span></code></p></td>
+<td><p>Preconditioner (<code class="docutils literal notranslate"><span class="pre">ASM</span></code>, <code class="docutils literal notranslate"><span class="pre">ILU</span></code>, <code class="docutils literal notranslate"><span class="pre">NONE</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_RTOL</span></code></p></td>
+<td><p>Relative convergence tolerance (e.g., <code class="docutils literal notranslate"><span class="pre">1.d-12</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_MAX_NB_IT</span></code></p></td>
+<td><p>Maximum iterations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NUM_LSS_RESTART_NB_IT</span></code></p></td>
+<td><p>GMRES restart interval</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="source-terms">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Source Terms</a><a class="headerlink" href="#source-terms" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Valid Values</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SRC_TERM</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">QUASI_1D</span></code>, <code class="docutils literal notranslate"><span class="pre">GRAVITY</span></code>, <code class="docutils literal notranslate"><span class="pre">SPH_1D</span></code>, <code class="docutils literal notranslate"><span class="pre">INV_STAG</span></code>,
+<code class="docutils literal notranslate"><span class="pre">INV_AXISYM</span></code>, <code class="docutils literal notranslate"><span class="pre">INV_AXISYM_SWIRL</span></code>, <code class="docutils literal notranslate"><span class="pre">KINETICS</span></code>,
+<code class="docutils literal notranslate"><span class="pre">LIB</span></code>, <code class="docutils literal notranslate"><span class="pre">JOULE_PRECICE</span></code>, <code class="docutils literal notranslate"><span class="pre">RAD_LOSS</span></code>, <code class="docutils literal notranslate"><span class="pre">RELAX</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="source_terms.html#source-terms"><span class="std std-ref">Source Terms</span></a> for detailed descriptions.</p>
+</section>
+<section id="grid-adaptation">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Grid Adaptation</a><a class="headerlink" href="#grid-adaptation" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 15.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F</span></code></p></td>
+<td><p>Enable grid adaptation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_MAX</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Maximum adaptation count</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_RATE</span></code></p></td>
+<td><p>1000</p></td>
+<td><p>Iterations between adaptations</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_START_ITER</span></code></p></td>
+<td><p>0</p></td>
+<td><p>First adaptation iteration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_AT_RESTART</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F</span></code></p></td>
+<td><p>Adapt on restart</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_F_BL</span></code></p></td>
+<td><p>0.5</p></td>
+<td><p>Boundary-layer cell fraction</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_F_SH</span></code></p></td>
+<td><p>0.9</p></td>
+<td><p>Shock-layer cell fraction</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_EPS0</span></code></p></td>
+<td><p>6.25</p></td>
+<td><p>Shock clustering factor</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_SHOCK_VAR</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RHO</span></code></p></td>
+<td><p>Detection variable (<code class="docutils literal notranslate"><span class="pre">RHO</span></code>, <code class="docutils literal notranslate"><span class="pre">P</span></code>, <code class="docutils literal notranslate"><span class="pre">T</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MESH_ADAPT_SHOCK_VAR_RISE</span></code></p></td>
+<td><p>1.2</p></td>
+<td><p>Freestream rise factor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="complete-input-file-example">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Complete Input File Example</a><a class="headerlink" href="#complete-input-file-example" title="Link to this heading"></a></h2>
+<p>Steady-state hypersonic flow over a blunt body:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#------------------------------------------------------------
+# FLUID MODEL
+#------------------------------------------------------------
+FLUID_MODEL = NS_NLTE
+FLUID_NB_SP = 5
+
+#------------------------------------------------------------
+# NUMERICAL SCHEMES
+#------------------------------------------------------------
+NUM_FLUX        = AUSM_PLUS
+NUM_FLUX_JAC    = JAMESON
+NUM_REC_PROC    = MUSCL
+NUM_REC_VAR     = RHOVP
+NUM_SLOPE_LIM   = VAN_ALBADA
+
+#------------------------------------------------------------
+# TIME INTEGRATION
+#------------------------------------------------------------
+NUM_TIME_INT    = BE
+NUM_LHS_JAC     = DPLR
+NUM_RUN_MODE    = CONSTANT_CFL
+NUM_CFL         = 100.0
+NUM_VNN         = 0.5
+
+#------------------------------------------------------------
+# LINEAR SOLVER
+#------------------------------------------------------------
+NUM_LSS_ALG         = GMRES
+NUM_LSS_PC          = ASM
+NUM_LSS_RTOL        = 1.d-12
+NUM_LSS_MAX_NB_IT   = 50
+NUM_LSS_RESTART_NB_IT = 30
+
+#------------------------------------------------------------
+# GRID ADAPTATION
+#------------------------------------------------------------
+MESH_ADAPT           = T
+MESH_ADAPT_MAX       = 3
+MESH_ADAPT_RATE      = 500
+MESH_ADAPT_F_BL      = 0.4
+MESH_ADAPT_F_SH      = 0.85
+MESH_ADAPT_SHOCK_VAR = RHO
+
+#------------------------------------------------------------
+# SOURCE TERMS
+#------------------------------------------------------------
+SRC_TERM = KINETICS
+SRC_TERM = INV_AXISYM
+
+#------------------------------------------------------------
+# STOP CONDITION
+#------------------------------------------------------------
+NUM_STOP_COND   = ITER
+NUM_MAX_ITER    = 5000
+</pre></div>
+</div>
+<p>Time-accurate unsteady simulation with dual-time stepping:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>FLUID_MODEL = NS
+
+NUM_FLUX        = ROE
+NUM_REC_PROC    = WENO5
+NUM_REC_VAR     = CHAR_RHOVP
+
+NUM_TIME_INT           = 3PB
+NUM_DUAL_TIME          = T
+NUM_LHS_JAC            = FULL
+NUM_RUN_MODE           = CONSTANT_DT
+NUM_DT                 = 1.0e-6
+NUM_CFL                = 50.0
+NUM_DUAL_TIME_MAX_IT   = 20
+NUM_DUAL_TIME_RES      = 1.d-6
+
+NUM_LSS_ALG    = GMRES
+NUM_LSS_RTOL   = 1.d-12
+</pre></div>
+</div>
+</section>
+<section id="test-coverage">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Test Coverage</a><a class="headerlink" href="#test-coverage" title="Link to this heading"></a></h2>
+<p>The following table summarises which scheme combinations are exercised by the
+regression test suite (<code class="docutils literal notranslate"><span class="pre">tests/regression/testcases.conf</span></code>) and the input
+test cases (<code class="docutils literal notranslate"><span class="pre">input/testcases/</span></code>).</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 15.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Scheme</p></th>
+<th class="head"><p>Tested</p></th>
+<th class="head"><p>Test Cases</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROE</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>EU_1D/2D/3D uniform flow, NS blunt wedge, NS_NLTE sphere</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AUSM_PLUS</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>NS_LTE sphere, NS_NLTE blunt body, EU_LTE blunt body</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">VAN_LEER</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>EU_NLTE nozzle, NS_NLTE stagnation line</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AUSM</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AUSM_PLUS_UP</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Commented out in some test files</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AUSM_PLUS_UP2</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HLLE</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">SW</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MOD_SW</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Commented option in NS_NLTE</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LF</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROE_IPC_WS</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROE_VPC_WS</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BLEND_UP_SKEW_SYM*</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Commented option only</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MUSCL</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Most test cases</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">WENO5</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>NS 3D jet</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CONST</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>NS_LTE 3D jet, NS_NLTE blunt body, ICP_LTE</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MP3</span></code> / <code class="docutils literal notranslate"><span class="pre">MP5</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">WENO3</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FE</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>EU basic test cases</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RK4</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>EU/NS time-accurate cases</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BE</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>NS_LTE, NS_NLTE steady-state cases</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">STRANG</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>EU_NLTE reacting flows</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">3PB</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Commented option only</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CN</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RK_LS</span></code> / <code class="docutils literal notranslate"><span class="pre">RK_LS_PI</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RK2_SSP</span></code> / <code class="docutils literal notranslate"><span class="pre">RK3_SSP</span></code></p></td>
+<td><p><strong>No</strong></p></td>
+<td><p>Not found in any test case</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A significant number of implemented schemes have <strong>no regression test
+coverage</strong>. This includes the AUSM+-up/up2 variants, HLLE, Steger-Warming,
+Lax-Friedrichs, preconditioned Roe, all hybrid/central schemes, MP
+reconstruction, and several time integrators. These schemes exist in source
+and can be selected, but their correctness is not verified by the automated
+test suite.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="preconditioning.html" class="btn btn-neutral float-left" title="Preconditioning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../architecture.html" class="btn btn-neutral float-right" title="Software Architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alessandro Munafo, Marco Panesi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+Overview
+========
+
+HEGEL (High fidElity tool for maGnEto-gas-dynamics simuLations) is a
+high-fidelity and flexible software for hypersonics and plasma simulations.
+It is developed by the CHESS group (Center for Hypersonics and Entry Systems
+Studies), originally at the University of Illinois at Urbana-Champaign and
+now at the University of California, Irvine, as part of the HERMES-AEROSPACE
+project.
+
+HEGEL is written in object-oriented fashion using modern Fortran 2008, and
+may be interfaced with other solvers for multi-physics calculations such as
+plasma wind tunnel simulations. The governing equations are discretized in
+space based on the cell-centered finite volume method. Time integration may
+be accomplished using explicit, implicit, or implicit-explicit (IMEX) methods.
+Parallelization is realized through the combined use of MPI and PETSc.
+
+Design Philosophy
+-----------------
+
+A key design principle of HEGEL is the separation of *physics* from *numerics*.
+The solver is designed by minimizing the dependency of the data structure on
+the details of the fluid model. In the ideal situation, the solver is only
+aware of: number of species, number of temperatures, and number of spatial
+dimensions. This allows treating calorically perfect gases, combustible
+mixtures, and multi-component plasmas under either equilibrium or
+nonequilibrium conditions within the same tool.
+
+For multi-component reactive simulations, the calculation of thermodynamic,
+transport, and optical properties — as well as source terms resulting from
+collisional and radiative processes — is delegated to an external
+physicochemical library. This task is currently accomplished using
+`PLATO <https://hermes-aerospace.github.io/plato-docs/>`_ (PLAsmas in
+Thermodynamic nOn-equilibrium). Usage of other tools such as EGLIB,
+Mutation, Mutation++, Cantera, and KAPPA is also possible with minimal
+implementation effort.
+
+Fluid Models
+------------
+
+The fluid models available in HEGEL fall into two main categories:
+
+**Calorically perfect gas**
+   The working fluid is treated as a calorically perfect gas. Thermodynamic
+   properties require only the ratio of specific heats (:math:`\gamma`) and
+   the specific gas constant (:math:`R`). Transport properties (e.g., dynamic
+   viscosity) are computed based on engineering models such as Sutherland's law.
+
+**Multi-component gas**
+   For reactive flows in hypersonics and combustion, HEGEL treats multi-species
+   gases as mixtures of dilute gases made of neutral as well as charged
+   particles (plasmas). The term *species* may refer to:
+
+   - Chemical components (e.g., N\ :sub:`2`, NO\ :sup:`+`) in multi-temperature models
+   - Individual energy levels (e.g., N(i)) in state-to-state approaches
+   - Groups of aggregated bound states in coarse-grained reduced-order formulations
+
+   Constitutive relations for thermodynamics, transport, and kinetics in
+   either LTE or NLTE conditions follow from the Chapman-Enskog method for
+   solving the Boltzmann equation.
+
+The specific fluid model configurations available are:
+
+- **EU_NS** — Euler/Navier-Stokes for calorically perfect gas
+- **EU_NS_LTE** — Navier-Stokes with Local Thermodynamic Equilibrium thermochemistry
+- **EU_NS_NLTE** — Navier-Stokes with Non-Local Thermodynamic Equilibrium thermochemistry
+- **ICP_LTE** — Inductively Coupled Plasma flows with LTE thermochemistry
+- **ICP_NLTE** — Inductively Coupled Plasma flows with NLTE thermochemistry
+
+Multi-Physics Coupling
+----------------------
+
+HEGEL may be coupled to other solvers to enable multi-physics simulations
+using the preCICE open-source coupling library. Compared to a monolithic
+approach, this strategy reduces software complexity and maintenance work.
+
+The coupling scheme for a plasma wind tunnel simulation involves:
+
+- **PLATO** — Physicochemical library providing thermodynamic, transport, and
+  optical properties as well as collisional-radiative source terms (library linkage)
+- **FLUX** — Electromagnetic field solver (MFEM-based FEM) for ICP simulations,
+  providing Joule heating and Lorentz force source terms (preCICE volume coupling)
+- **MURP** — Radiation transport solver for non-grey media (PETSc-based FV),
+  providing radiative source terms (preCICE volume coupling)
+- **PATO / CHyPS** — Material response solvers for ablative thermal protection
+  systems (preCICE surface coupling)
+
+The ``coupler`` class manages data exchange via preCICE, with child classes
+``coupler_surf`` and ``coupler_vol`` providing methods for surface and volume
+coupling, respectively.
+
+Demonstrated Applications
+-------------------------
+
+HEGEL has been validated and applied to a range of problems:
+
+- 1D channel flow with LODI non-reflecting boundary conditions
+- 2D acoustic pulse propagation
+- 3D compressible Taylor-Green vortex decay (DNS at Re = 400, M = 2)
+- Hypersonic flow past a sphere (calorically perfect gas, with grid adaptation)
+- NLTE hypersonic flow past a sphere coupled with radiation (HEGEL + MURP)
+- LTE plasma jet with Kelvin-Helmholtz instabilities (hybrid upwind-central scheme)
+- Axisymmetric ICP torch discharge (HEGEL + FLUX + MURP, Plasmatron X geometry)
+- 3D ICP torch discharge with 13-block structured grid

@@ -1,0 +1,19 @@
+Fortran API Reference
+=====================
+
+.. note::
+   This section is under development. HEGEL's primary interface is through
+   its input files and executable. The Fortran modules and subroutines are
+   documented here for developers.
+
+Key Modules
+-----------
+
+The main Fortran modules in HEGEL include:
+
+- ``mod_fluid`` — Core fluid solver routines
+- ``mod_grid`` — Grid data structures
+- ``mod_field`` — Field variable management
+- ``mod_physics`` — Physical models and gas properties
+- ``mod_time_integrator`` — Time integration schemes
+- ``mod_sim_control`` — Simulation parameters and control

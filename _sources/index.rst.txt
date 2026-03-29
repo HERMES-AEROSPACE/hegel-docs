@@ -1,0 +1,61 @@
+.. HEGEL documentation master file
+
+======================================================
+HEGEL — High fidElity maGnEto-gas-dynamics simuLations
+======================================================
+
+**HEGEL** is a high-fidelity multi-physics solver for nonequilibrium
+magneto-gas-dynamics simulations. It solves the compressible Navier-Stokes
+equations coupled with thermochemical nonequilibrium models for hypersonic
+flows, inductively coupled plasma (ICP) torches, and related applications.
+
+Written in Fortran 2003/2008, HEGEL uses a cell-centered finite volume
+method with the AUSM+-up all-speed flux scheme and supports parallel
+execution via MPI/PETSc. It interfaces with PLATO for thermochemistry,
+FLUX for electromagnetics, and MURP for radiation through the preCICE
+coupling library.
+
+.. note::
+
+   Reference paper: Munafò, A., Panesi, M., *AIAA Paper 2024-0449*,
+   January 2024. DOI: `10.2514/6.2024-0449 <https://doi.org/10.2514/6.2024-0449>`_
+
+.. toctree::
+   :maxdepth: 2
+   :caption: User Documentation
+
+   getting_started
+   user_guide
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Theory & Physics
+
+   overview
+   physics
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Numerical Schemes
+
+   numerical_schemes/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Developer Documentation
+
+   architecture
+   development
+
+.. toctree::
+   :maxdepth: 1
+   :caption: API Documentation
+
+   api_fortran
+   api_doxygen
+
+Indices and Tables
+==================
+
+* :ref:`genindex`
+* :ref:`search`

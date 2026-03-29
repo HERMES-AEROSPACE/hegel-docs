@@ -1,0 +1,401 @@
+.. _input-reference:
+
+================================
+Input Parameter Reference
+================================
+
+This section provides a complete reference of all input parameters related to
+numerical scheme selection and configuration in HEGEL.
+
+.. contents:: On this page
+   :local:
+   :depth: 2
+
+
+Fluid Model Selection
+=====================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 15 70
+
+   * - Keyword
+     - Values
+     - Description
+   * - ``FLUID_MODEL``
+     - ``EU``, ``NS``, ``EU_LTE``, ``NS_LTE``, ``EU_NLTE``, ``NS_NLTE``, ``ICP_LTE``, ``ICP_NLTE``
+     - Fluid model selection. ``EU`` = Euler (inviscid), ``NS`` = Navier-Stokes.
+   * - ``FLUID_GAMMA``
+     - real
+     - Ratio of specific heats :math:`\gamma` (EU/NS only)
+   * - ``FLUID_R``
+     - real
+     - Specific gas constant [J/(kg K)] (EU/NS only)
+   * - ``FLUID_M_INF``
+     - real
+     - Freestream Mach number (also used for preconditioning)
+
+
+Numerical Flux
+==============
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Keyword
+     - Valid Values
+   * - ``NUM_FLUX``
+     - ``ROE``, ``AUSM``, ``AUSM_PLUS``, ``AUSM_PLUS_UP``, ``AUSM_PLUS_UP2``,
+       ``VAN_LEER``, ``HLLE``, ``SW``, ``MOD_SW``, ``LF``,
+       ``ROE_IPC_WS``, ``ROE_VPC_WS``,
+       ``SKEW_SYM2``, ``SKEW_SYM4``, ``SKEW_SYM2_NU``, ``SKEW_SYM4_NU``,
+       ``BLEND_UP_SKEW_SYM2``, ``BLEND_UP_SKEW_SYM4``,
+       ``BLEND_UP_SKEW_SYM2_NU``, ``BLEND_UP_SKEW_SYM4_NU``
+   * - ``NUM_FLUX_JAC``
+     - ``JAMESON``, ``POS_NEG_SPLIT``, ``FD``, or scheme-specific exact Jacobian (``ROE``)
+
+See :ref:`flux-schemes` for detailed descriptions.
+
+
+Reconstruction
+==============
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Keyword
+     - Valid Values
+   * - ``NUM_REC_PROC``
+     - ``CONST``, ``MUSCL``, ``MUSCL_NO_LIM``, ``WENO3``, ``WENO5``,
+       ``WENO3_NU``, ``WENO5_NU``, ``MP3``, ``MP5``
+   * - ``NUM_REC_VAR``
+     - ``RHOVP``, ``CHAR_RHOVP``, ``RHOVT`` (LTE only)
+   * - ``NUM_SLOPE_LIM``
+     - ``VAN_ALBADA`` (default; other limiters available in source)
+
+See :ref:`spatial-discretization` for detailed descriptions.
+
+
+Time Integration
+================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Keyword
+     - Valid Values / Description
+   * - ``NUM_TIME_INT``
+     - ``FE``, ``RK2``, ``RK4``, ``RK_LS``, ``RK_LS_PI``,
+       ``RK2_SSP``, ``RK3_SSP``, ``RK2_TVD``, ``RK3_TVD``,
+       ``STRANG``, ``OS``, ``BE``, ``3PB``, ``CN``
+   * - ``NUM_RUN_MODE``
+     - ``CONSTANT_CFL``, ``CONSTANT_DT``
+   * - ``NUM_CFL``
+     - CFL number (real)
+   * - ``NUM_VNN``
+     - Von Neumann number (real)
+   * - ``NUM_DT``
+     - Global time step [s] (for ``CONSTANT_DT`` mode)
+   * - ``NUM_LHS_JAC``
+     - ``FULL``, ``DIAG``, ``DPLR``
+   * - ``NUM_JAC_UPDATE_RATE``
+     - Update Jacobian every N iterations (integer)
+
+See :ref:`time-integration` for detailed descriptions.
+
+
+Dual-Time Stepping
+==================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 65
+
+   * - Keyword
+     - Description
+   * - ``NUM_DUAL_TIME``
+     - ``T`` / ``F`` --- enable dual-time stepping
+   * - ``NUM_DUAL_TIME_MAX_IT``
+     - Maximum sub-iterations per physical time step
+   * - ``NUM_DUAL_TIME_RES``
+     - Convergence threshold (residual L2 norm)
+   * - ``NUM_DUAL_TIME_WRMS_LIM``
+     - Convergence threshold (WRMS error)
+   * - ``NUM_DUAL_TIME_WRMS_RTOL``
+     - Relative tolerance for WRMS convergence test
+   * - ``NUM_DUAL_TIME_WRMS_ATOL``
+     - Absolute tolerance for WRMS convergence test
+
+
+Linear Solver (PETSc KSP)
+==========================
+
+These parameters control the iterative linear solver when
+``NUM_LHS_JAC = FULL``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Keyword
+     - Description
+   * - ``NUM_LSS_ALG``
+     - KSP algorithm (e.g., ``GMRES``)
+   * - ``NUM_LSS_PC``
+     - Preconditioner (``ASM``, ``ILU``, ``NONE``)
+   * - ``NUM_LSS_RTOL``
+     - Relative convergence tolerance (e.g., ``1.d-12``)
+   * - ``NUM_LSS_MAX_NB_IT``
+     - Maximum iterations
+   * - ``NUM_LSS_RESTART_NB_IT``
+     - GMRES restart interval
+
+
+Source Terms
+============
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Keyword
+     - Valid Values
+   * - ``SRC_TERM``
+     - ``QUASI_1D``, ``GRAVITY``, ``SPH_1D``, ``INV_STAG``,
+       ``INV_AXISYM``, ``INV_AXISYM_SWIRL``, ``KINETICS``,
+       ``LIB``, ``JOULE_PRECICE``, ``RAD_LOSS``, ``RELAX``
+
+See :ref:`source-terms` for detailed descriptions.
+
+
+Grid Adaptation
+===============
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 15 50
+
+   * - Keyword
+     - Default
+     - Description
+   * - ``MESH_ADAPT``
+     - ``F``
+     - Enable grid adaptation
+   * - ``MESH_ADAPT_MAX``
+     - 1
+     - Maximum adaptation count
+   * - ``MESH_ADAPT_RATE``
+     - 1000
+     - Iterations between adaptations
+   * - ``MESH_ADAPT_START_ITER``
+     - 0
+     - First adaptation iteration
+   * - ``MESH_ADAPT_AT_RESTART``
+     - ``F``
+     - Adapt on restart
+   * - ``MESH_ADAPT_F_BL``
+     - 0.5
+     - Boundary-layer cell fraction
+   * - ``MESH_ADAPT_F_SH``
+     - 0.9
+     - Shock-layer cell fraction
+   * - ``MESH_ADAPT_EPS0``
+     - 6.25
+     - Shock clustering factor
+   * - ``MESH_ADAPT_SHOCK_VAR``
+     - ``RHO``
+     - Detection variable (``RHO``, ``P``, ``T``)
+   * - ``MESH_ADAPT_SHOCK_VAR_RISE``
+     - 1.2
+     - Freestream rise factor
+
+
+Complete Input File Example
+============================
+
+Steady-state hypersonic flow over a blunt body:
+
+.. code-block:: none
+
+   #------------------------------------------------------------
+   # FLUID MODEL
+   #------------------------------------------------------------
+   FLUID_MODEL = NS_NLTE
+   FLUID_NB_SP = 5
+
+   #------------------------------------------------------------
+   # NUMERICAL SCHEMES
+   #------------------------------------------------------------
+   NUM_FLUX        = AUSM_PLUS
+   NUM_FLUX_JAC    = JAMESON
+   NUM_REC_PROC    = MUSCL
+   NUM_REC_VAR     = RHOVP
+   NUM_SLOPE_LIM   = VAN_ALBADA
+
+   #------------------------------------------------------------
+   # TIME INTEGRATION
+   #------------------------------------------------------------
+   NUM_TIME_INT    = BE
+   NUM_LHS_JAC     = DPLR
+   NUM_RUN_MODE    = CONSTANT_CFL
+   NUM_CFL         = 100.0
+   NUM_VNN         = 0.5
+
+   #------------------------------------------------------------
+   # LINEAR SOLVER
+   #------------------------------------------------------------
+   NUM_LSS_ALG         = GMRES
+   NUM_LSS_PC          = ASM
+   NUM_LSS_RTOL        = 1.d-12
+   NUM_LSS_MAX_NB_IT   = 50
+   NUM_LSS_RESTART_NB_IT = 30
+
+   #------------------------------------------------------------
+   # GRID ADAPTATION
+   #------------------------------------------------------------
+   MESH_ADAPT           = T
+   MESH_ADAPT_MAX       = 3
+   MESH_ADAPT_RATE      = 500
+   MESH_ADAPT_F_BL      = 0.4
+   MESH_ADAPT_F_SH      = 0.85
+   MESH_ADAPT_SHOCK_VAR = RHO
+
+   #------------------------------------------------------------
+   # SOURCE TERMS
+   #------------------------------------------------------------
+   SRC_TERM = KINETICS
+   SRC_TERM = INV_AXISYM
+
+   #------------------------------------------------------------
+   # STOP CONDITION
+   #------------------------------------------------------------
+   NUM_STOP_COND   = ITER
+   NUM_MAX_ITER    = 5000
+
+Time-accurate unsteady simulation with dual-time stepping:
+
+.. code-block:: none
+
+   FLUID_MODEL = NS
+
+   NUM_FLUX        = ROE
+   NUM_REC_PROC    = WENO5
+   NUM_REC_VAR     = CHAR_RHOVP
+
+   NUM_TIME_INT           = 3PB
+   NUM_DUAL_TIME          = T
+   NUM_LHS_JAC            = FULL
+   NUM_RUN_MODE           = CONSTANT_DT
+   NUM_DT                 = 1.0e-6
+   NUM_CFL                = 50.0
+   NUM_DUAL_TIME_MAX_IT   = 20
+   NUM_DUAL_TIME_RES      = 1.d-6
+
+   NUM_LSS_ALG    = GMRES
+   NUM_LSS_RTOL   = 1.d-12
+
+
+Test Coverage
+=============
+
+The following table summarises which scheme combinations are exercised by the
+regression test suite (``tests/regression/testcases.conf``) and the input
+test cases (``input/testcases/``).
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 15 60
+
+   * - Scheme
+     - Tested
+     - Test Cases
+   * - ``ROE``
+     - Yes
+     - EU_1D/2D/3D uniform flow, NS blunt wedge, NS_NLTE sphere
+   * - ``AUSM_PLUS``
+     - Yes
+     - NS_LTE sphere, NS_NLTE blunt body, EU_LTE blunt body
+   * - ``VAN_LEER``
+     - Yes
+     - EU_NLTE nozzle, NS_NLTE stagnation line
+   * - ``AUSM``
+     - **No**
+     - Not found in any test case
+   * - ``AUSM_PLUS_UP``
+     - **No**
+     - Commented out in some test files
+   * - ``AUSM_PLUS_UP2``
+     - **No**
+     - Not found in any test case
+   * - ``HLLE``
+     - **No**
+     - Not found in any test case
+   * - ``SW``
+     - **No**
+     - Not found in any test case
+   * - ``MOD_SW``
+     - **No**
+     - Commented option in NS_NLTE
+   * - ``LF``
+     - **No**
+     - Not found in any test case
+   * - ``ROE_IPC_WS``
+     - **No**
+     - Not found in any test case
+   * - ``ROE_VPC_WS``
+     - **No**
+     - Not found in any test case
+   * - ``BLEND_UP_SKEW_SYM*``
+     - **No**
+     - Commented option only
+   * - ``MUSCL``
+     - Yes
+     - Most test cases
+   * - ``WENO5``
+     - Yes
+     - NS 3D jet
+   * - ``CONST``
+     - Yes
+     - NS_LTE 3D jet, NS_NLTE blunt body, ICP_LTE
+   * - ``MP3`` / ``MP5``
+     - **No**
+     - Not found in any test case
+   * - ``WENO3``
+     - **No**
+     - Not found in any test case
+   * - ``FE``
+     - Yes
+     - EU basic test cases
+   * - ``RK4``
+     - Yes
+     - EU/NS time-accurate cases
+   * - ``BE``
+     - Yes
+     - NS_LTE, NS_NLTE steady-state cases
+   * - ``STRANG``
+     - Yes
+     - EU_NLTE reacting flows
+   * - ``3PB``
+     - **No**
+     - Commented option only
+   * - ``CN``
+     - **No**
+     - Not found in any test case
+   * - ``RK_LS`` / ``RK_LS_PI``
+     - **No**
+     - Not found in any test case
+   * - ``RK2_SSP`` / ``RK3_SSP``
+     - **No**
+     - Not found in any test case
+
+.. warning::
+
+   A significant number of implemented schemes have **no regression test
+   coverage**. This includes the AUSM+-up/up2 variants, HLLE, Steger-Warming,
+   Lax-Friedrichs, preconditioned Roe, all hybrid/central schemes, MP
+   reconstruction, and several time integrators. These schemes exist in source
+   and can be selected, but their correctness is not verified by the automated
+   test suite.

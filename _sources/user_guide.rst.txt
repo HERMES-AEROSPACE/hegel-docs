@@ -1,0 +1,133 @@
+User Guide
+==========
+
+Running HEGEL
+-------------
+
+HEGEL is invoked by passing an input file as the command-line argument:
+
+.. code-block:: bash
+
+   # Serial execution
+   hegel path/to/input_file
+
+   # Parallel execution (4 processors)
+   mpirun -np 4 hegel path/to/input_file
+
+The executable can be run from the build directory (``src/hegel``) or, if
+installed, from ``$HEGEL_DIR/bin/hegel``.
+
+Available Test Cases
+--------------------
+
+HEGEL ships with a collection of test cases in ``input/testcases/``:
+
+**Euler/Navier-Stokes (calorically perfect gas)**
+
+- ``EU_NS/1D/EU_1D_Sod_ShockTube`` — Classic Sod shock tube problem
+- ``EU_NS/1D/`` — Additional 1D verification cases (channel flow, etc.)
+- ``EU_NS/2D/`` — Two-dimensional problems (blunt body, acoustic pulse)
+
+**LTE thermochemistry**
+
+- ``EU_NS_LTE/`` — Equilibrium air flows
+
+**NLTE thermochemistry**
+
+- ``EU_NS_NLTE/`` — Nonequilibrium air flows (hypersonic entry problems)
+
+**ICP simulations**
+
+- ``ICP_LTE/`` — ICP torch simulations with LTE thermochemistry
+- ``ICP_NLTE/`` — ICP torch simulations with NLTE thermochemistry
+
+Configure Options for Fluid Models
+-----------------------------------
+
+The fluid model is selected at build time via ``configure`` flags:
+
+.. code-block:: bash
+
+   # Calorically perfect gas only
+   ./configure --enable-euns=yes \
+               --enable-euns_nlte=no \
+               --enable-euns_lte=no \
+               --enable-icp_lte=no \
+               --enable-icp_nlte=no \
+               ...
+
+   # Full NLTE with ICP support
+   ./configure --enable-euns=yes \
+               --enable-euns_nlte=yes \
+               --enable-euns_lte=yes \
+               --enable-icp_lte=yes \
+               --enable-icp_nlte=yes \
+               --with-plato=$PLATO_DIR \
+               ...
+
+Optional Library Integration
+-----------------------------
+
+**CGNS** — For mesh and solution I/O in CFD General Notation System format:
+
+.. code-block:: bash
+
+   ./configure --with-cgns=$CGNS_DIR ...
+
+**tecIO** — For Tecplot binary file output:
+
+.. code-block:: bash
+
+   ./configure --with-tecio=$TECIO_DIR ...
+
+**PLATO** — Required for LTE/NLTE simulations:
+
+.. code-block:: bash
+
+   ./configure --with-plato=$PLATO_DIR ...
+
+**preCICE** — For multi-physics coupling (FLUX, MURP, PATO/CHyPS):
+
+.. code-block:: bash
+
+   ./configure --with-precice=$PRECICE_DIR ...
+
+Typical Simulation Workflow
+---------------------------
+
+**Steady-state blunt body simulation (two-step approach):**
+
+1. Compute a first-order solution using a diffusive flux (van Leer's flux
+   vector splitting) with backward Euler and local time-stepping. This
+   provides a robust initial field.
+
+2. Restart with the second-order scheme (AUSM+ with MUSCL reconstruction and
+   van Albada slope limiter). Apply grid adaptation at restart to align the
+   grid with the shock and prevent oscillations.
+
+**Unsteady plasma jet simulation:**
+
+1. Obtain a steady first-order solution as the initial field (backward Euler
+   with local time-stepping).
+
+2. Restart with the hybrid upwind-central flux and an explicit time integrator
+   (e.g., 4th-order Runge-Kutta). Use LODI boundary conditions to minimize
+   reflections at domain boundaries.
+
+**Coupled ICP torch simulation (HEGEL + FLUX + MURP):**
+
+1. Build HEGEL with preCICE support and the ICP fluid model enabled.
+
+2. Prepare preCICE configuration file defining the coupling scheme,
+   exchange quantities, and time windowing.
+
+3. Launch all three solvers simultaneously under preCICE coordination.
+
+Output Formats
+--------------
+
+HEGEL can output solution data in the following formats:
+
+- **CGNS** — Industry-standard CFD format (requires CGNS library)
+- **Tecplot binary** — Via tecIO library
+- **ASCII** — Plain text output for post-processing

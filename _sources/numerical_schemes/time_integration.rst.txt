@@ -1,0 +1,529 @@
+.. _time-integration:
+
+================
+Time Integration
+================
+
+HEGEL provides explicit, implicit, and operator-splitting time integrators.
+The integrator is selected via the ``NUM_TIME_INT`` keyword. Implicit methods
+additionally require ``NUM_LHS_JAC`` to specify the Jacobian approximation.
+
+.. contents:: On this page
+   :local:
+   :depth: 2
+
+
+Summary
+=======
+
+.. list-table::
+   :header-rows: 1
+   :widths: 12 25 10 10 10 33
+
+   * - Keyword
+     - Class
+     - Type
+     - Order
+     - Dual-Time
+     - LHS Approximation
+   * - ``FE``
+     - ``forward_Euler``
+     - Explicit
+     - 1
+     - --
+     - --
+   * - ``RK2``
+     - ``Runge_Kutta``
+     - Explicit
+     - 2
+     - --
+     - --
+   * - ``RK4``
+     - ``Runge_Kutta``
+     - Explicit
+     - 4
+     - --
+     - --
+   * - ``RK_LS``
+     - ``Runge_Kutta_ls``
+     - Explicit
+     - varies
+     - --
+     - --
+   * - ``RK_LS_PI``
+     - ``Runge_Kutta_ls_pi``
+     - Semi-impl.
+     - varies
+     - --
+     - ``DIAG``
+   * - ``RK2_SSP``
+     - ``Runge_Kutta_ssp``
+     - Explicit
+     - 2
+     - --
+     - --
+   * - ``RK3_SSP``
+     - ``Runge_Kutta_ssp``
+     - Explicit
+     - 3
+     - --
+     - --
+   * - ``RK2_TVD``
+     - ``Runge_Kutta_ssp``
+     - Explicit
+     - 2
+     - --
+     - --
+   * - ``RK3_TVD``
+     - ``Runge_Kutta_ssp``
+     - Explicit
+     - 3
+     - --
+     - --
+   * - ``STRANG``
+     - ``Strang_splitting``
+     - Splitting
+     - 2
+     - --
+     - --
+   * - ``OS``
+     - ``Strang_splitting``
+     - Splitting
+     - 2
+     - --
+     - --
+   * - ``BE``
+     - ``backward_Euler*``
+     - Implicit
+     - 1
+     - Optional
+     - ``FULL``, ``DIAG``, ``DPLR``
+   * - ``3PB``
+     - ``three_point_backward*``
+     - Implicit
+     - 2
+     - Required
+     - ``FULL``, ``DIAG``
+   * - ``CN``
+     - ``crank_nicolson_dt``
+     - Implicit
+     - 2
+     - Required
+     - ``FULL``
+
+**Source directory:** ``src/time_integrator/``
+
+**Data constants:** ``src/data/data_time_int.F90``
+
+
+Explicit Methods
+================
+
+.. _ti-fe:
+
+Forward Euler
+-------------
+
+First-order explicit method:
+
+.. math::
+
+   U^{n+1} = U^n + \Delta t \, R(U^n)
+
+where :math:`R(U)` is the spatial residual (RHS).
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_TIME_INT = FE
+
+**Source files:** ``class_fe.F90``, ``fe.F90``
+
+.. _ti-rk:
+
+Classical Runge-Kutta (RK2, RK4)
+----------------------------------
+
+Standard multi-stage Runge-Kutta methods using the Butcher tableau
+representation. RK2 is the midpoint method; RK4 is the classical 4-stage
+method.
+
+**RK4 Butcher tableau:**
+
+.. math::
+
+   \begin{array}{c|cccc}
+   0 & & & & \\
+   1/2 & 1/2 & & & \\
+   1/2 & 0 & 1/2 & & \\
+   1 & 0 & 0 & 1 & \\
+   \hline
+   & 1/6 & 1/3 & 1/3 & 1/6
+   \end{array}
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_TIME_INT = RK4   # or RK2
+   NUM_RUN_MODE = CONSTANT_CFL
+   NUM_CFL      = 0.5
+
+**Source files:** ``class_rk.F90``, ``rk.F90``
+
+.. _ti-rk-ssp:
+
+SSP Runge-Kutta (TVD)
+---------------------
+
+Strong Stability Preserving (SSP) variants that maintain the Total Variation
+Diminishing (TVD) property of the spatial discretization. Essential when using
+limiters near discontinuities.
+
+**SSP-RK3 (Shu-Osher form):**
+
+.. math::
+
+   U^{(1)} &= U^n + \Delta t \, R(U^n) \\
+   U^{(2)} &= \tfrac{3}{4} U^n + \tfrac{1}{4} U^{(1)}
+              + \tfrac{1}{4} \Delta t \, R(U^{(1)}) \\
+   U^{n+1} &= \tfrac{1}{3} U^n + \tfrac{2}{3} U^{(2)}
+              + \tfrac{2}{3} \Delta t \, R(U^{(2)})
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_TIME_INT = RK3_SSP   # or RK2_SSP, RK2_TVD, RK3_TVD
+
+**Source files:** ``class_rk_ssp.F90``, ``rk_ssp.F90``
+
+.. note::
+
+   ``RK2_TVD`` and ``RK2_SSP`` are identical; likewise ``RK3_TVD`` and ``RK3_SSP``.
+
+.. _ti-rk-ls:
+
+Low-Storage Runge-Kutta
+------------------------
+
+Memory-efficient RK variants using the 2N-storage formulation. Only two
+solution-sized arrays are needed regardless of the number of stages.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_TIME_INT = RK_LS
+
+**Source files:** ``class_rk_ls.F90``, ``rk_ls.F90``
+
+.. _ti-rk-ls-pi:
+
+Low-Storage RK (Point-Implicit)
+--------------------------------
+
+Low-storage RK with point-implicit treatment of the source term diagonal.
+Improves stability for stiff source terms without the cost of a full implicit
+solve.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_TIME_INT = RK_LS_PI
+
+**Source files:** ``class_rk_ls_pi.F90``, ``rk_ls_pi.F90``
+
+.. warning::
+
+   Not available when sponge zones are present.
+
+
+.. _ti-strang:
+
+Strang Splitting
+----------------
+
+Second-order operator splitting that separates the convective (flux) operator
+from the stiff source (chemistry/relaxation) operator:
+
+.. math::
+
+   U^{n+1} = S_{\Delta t/2} \circ F_{\Delta t} \circ S_{\Delta t/2} \, U^n
+
+The source operator :math:`S` uses an external ODE integrator (CVODE/LSODE
+via SUNDIALS) to handle chemical stiffness. Default ODE tolerances:
+``rtol = 1e-6``, ``atol = 1e-9``.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_TIME_INT = STRANG   # or OS
+   NUM_RUN_MODE = CONSTANT_DT
+   NUM_DT       = 1.0e-8
+
+**Source files:** ``class_Strang.F90``, ``Strang.F90``, ``Strang_flux.F90``, ``Strang_source.F90``
+
+.. note::
+
+   Requires constant time-step mode (``CONSTANT_DT``). Requires SUNDIALS
+   at compile time (``--with-sundials``).
+
+
+Implicit Methods
+================
+
+Implicit methods solve a linear system at each time step. The structure of
+the left-hand side (LHS) matrix is controlled by ``NUM_LHS_JAC``:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 30 55
+
+   * - Keyword
+     - Approximation
+     - Description
+   * - ``FULL``
+     - Full sparse Jacobian
+     - Solved by PETSc GMRES. Most accurate but most expensive.
+   * - ``DIAG``
+     - Block-diagonal (point-implicit)
+     - Each cell inverted independently. Fast, low memory.
+   * - ``DPLR``
+     - Data-Parallel Line Relaxation
+     - Tridiagonal block solves along grid lines. Good balance of accuracy/cost.
+
+
+.. _ti-be:
+
+Backward Euler
+--------------
+
+First-order implicit:
+
+.. math::
+
+   \frac{U^{n+1} - U^n}{\Delta t} = R(U^{n+1})
+
+Linearised as:
+
+.. math::
+
+   \left[\frac{V}{\Delta t} I - \frac{\partial R}{\partial U}\right] \Delta U = R(U^n)
+
+Three LHS variants are available:
+
+**Backward Euler + FULL:**
+
+.. code-block:: none
+
+   NUM_TIME_INT = BE
+   NUM_LHS_JAC  = FULL
+   NUM_LSS_ALG  = GMRES
+   NUM_LSS_PC   = ASM
+   NUM_LSS_RTOL = 1.d-12
+   NUM_CFL      = 50
+
+**Backward Euler + DIAG (point-implicit):**
+
+.. code-block:: none
+
+   NUM_TIME_INT = BE
+   NUM_LHS_JAC  = DIAG
+   NUM_CFL      = 10
+
+**Backward Euler + DPLR (line relaxation):**
+
+.. code-block:: none
+
+   NUM_TIME_INT = BE
+   NUM_LHS_JAC  = DPLR
+   NUM_CFL      = 100
+
+**Source files:**
+
+- ``class_be.F90``, ``be.F90`` (FULL)
+- ``class_be_diag.F90``, ``be_diag.F90`` (DIAG)
+- ``class_be_dplr.F90``, ``be_dplr.F90`` (DPLR)
+
+.. note::
+
+   DPLR is not available for parallel 1D simulations. Sponge zones are not
+   supported with ``BE``.
+
+
+Dual-Time Stepping
+==================
+
+For time-accurate implicit simulations, HEGEL uses dual-time stepping: an
+inner pseudo-time iteration drives the solution to convergence at each
+physical time level. Enable with:
+
+.. code-block:: none
+
+   NUM_DUAL_TIME = T
+
+Key parameters:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 15 50
+
+   * - Keyword
+     - Default
+     - Description
+   * - ``NUM_DUAL_TIME_MAX_IT``
+     - --
+     - Maximum sub-iterations per physical time step
+   * - ``NUM_DUAL_TIME_RES``
+     - --
+     - Convergence threshold (residual L2 norm)
+   * - ``NUM_DUAL_TIME_WRMS_LIM``
+     - --
+     - Convergence threshold (WRMS error)
+   * - ``NUM_DUAL_TIME_WRMS_RTOL``
+     - --
+     - Relative tolerance for WRMS test
+   * - ``NUM_DUAL_TIME_WRMS_ATOL``
+     - --
+     - Absolute tolerance for WRMS test
+
+.. _ti-3pb:
+
+Three-Point Backward (BDF2)
+----------------------------
+
+Second-order implicit time-accurate method using three time levels:
+
+.. math::
+
+   \frac{3 U^{n+1} - 4 U^n + U^{n-1}}{2 \Delta t} = R(U^{n+1})
+
+Implemented as a special case of the general unsteady formulation with
+:math:`\theta = 1`, :math:`\phi = 0.5`.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_TIME_INT      = 3PB
+   NUM_DUAL_TIME     = T
+   NUM_RUN_MODE      = CONSTANT_DT
+   NUM_DT            = 1.0e-6
+   NUM_DUAL_TIME_MAX_IT = 20
+
+**Source files:**
+
+- ``class_tpb_dt.F90``, ``tpb_dt.F90`` (FULL)
+- ``class_tpb_dt_diag.F90``, ``tpb_dt_diag.F90`` (DIAG)
+
+.. _ti-cn:
+
+Crank-Nicolson
+--------------
+
+Second-order implicit time-accurate method:
+
+.. math::
+
+   \frac{U^{n+1} - U^n}{\Delta t} = \frac{1}{2}\bigl[R(U^{n+1}) + R(U^n)\bigr]
+
+Implemented with :math:`\theta = 0.5`, :math:`\phi = 0`.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_TIME_INT      = CN
+   NUM_DUAL_TIME     = T
+   NUM_RUN_MODE      = CONSTANT_DT
+   NUM_DT            = 1.0e-6
+
+**Source files:** ``class_cn_dt.F90``, ``cn_dt.F90``
+
+.. note::
+
+   Only ``FULL`` LHS approximation is available for Crank-Nicolson.
+
+
+Run Modes and CFL Control
+==========================
+
+Two run modes control how the time step is determined:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Keyword
+     - Description
+   * - ``CONSTANT_CFL``
+     - Local time step computed per cell from CFL/VNN condition. Used for
+       steady-state acceleration (time steps vary spatially).
+   * - ``CONSTANT_DT``
+     - Global uniform time step. Required for time-accurate and dual-time
+       simulations.
+
+**CFL-related parameters:**
+
+.. code-block:: none
+
+   NUM_CFL      = 1.0        # CFL number
+   NUM_VNN      = 0.5        # Von Neumann number (viscous stability)
+   NUM_RUN_MODE = CONSTANT_CFL
+
+**CFL ramping:** The CFL number can be ramped during the simulation using a
+CFL table file specified in the boundary condition file. This allows gradual
+increase of CFL from a safe initial value to a large target value for
+steady-state convergence.
+
+**RHS time-step options:**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Mode
+     - Description
+   * - ``RHS_TIME_STEP_MULT_GLOBAL``
+     - RHS multiplied by global :math:`\Delta t`
+   * - ``RHS_TIME_STEP_MULT_LOCAL``
+     - RHS multiplied by local :math:`\Delta t` (per cell)
+   * - ``RHS_NO_TIME_STEP_MULT_VOL_DIV``
+     - No time-step multiplication (steady formulation)
+
+
+PETSc Linear Solver Options
+============================
+
+When using ``NUM_LHS_JAC = FULL``, the linear system is solved by PETSc KSP.
+The following parameters control the linear solver:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 15 55
+
+   * - Keyword
+     - Example
+     - Description
+   * - ``NUM_LSS_ALG``
+     - ``GMRES``
+     - KSP algorithm
+   * - ``NUM_LSS_PC``
+     - ``ASM``
+     - Preconditioner (``ASM``, ``ILU``, ``NONE``)
+   * - ``NUM_LSS_RTOL``
+     - ``1.d-12``
+     - Relative convergence tolerance
+   * - ``NUM_LSS_MAX_NB_IT``
+     - ``100``
+     - Maximum GMRES iterations
+   * - ``NUM_LSS_RESTART_NB_IT``
+     - ``30``
+     - GMRES restart interval
+   * - ``NUM_JAC_UPDATE_RATE``
+     - ``1``
+     - Update Jacobian every N sub-iterations

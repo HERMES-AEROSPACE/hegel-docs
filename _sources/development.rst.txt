@@ -1,0 +1,35 @@
+Development
+===========
+
+.. note::
+   This section is under development.
+
+Contributing
+------------
+
+HEGEL development follows the HERMES-AEROSPACE team principles:
+*working beats perfect, merged beats isolated.*
+
+CI/CD
+-----
+
+HEGEL uses GitHub Actions with a self-hosted runner on the newton server
+for continuous integration. The CI pipeline runs the regression test suite
+on every push and pull request.
+
+Testing
+-------
+
+The regression test suite is located in ``tests/`` and covers:
+
+- 1D shock tube problems
+- Quasi-1D nozzle flows
+- 2D benchmark cases
+- Stagnation line computations
+
+Run the test suite:
+
+.. code-block:: bash
+
+   cd tests
+   ./run_tests.sh

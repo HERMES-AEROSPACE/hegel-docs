@@ -1,0 +1,659 @@
+.. _flux-schemes:
+
+=============
+Flux Schemes
+=============
+
+HEGEL provides a wide selection of inviscid (convective) numerical flux
+functions. All are selected at runtime via the ``NUM_FLUX`` input keyword.
+Viscous (diffusive) fluxes are always computed when a Navier-Stokes model is
+active and do not require a separate keyword.
+
+.. contents:: On this page
+   :local:
+   :depth: 2
+
+
+Availability Matrix
+===================
+
+Not every flux scheme is implemented in every fluid model. The table below
+shows which combinations are available.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 8 8 8 12 12
+
+   * - Flux Scheme
+     - EU/NS
+     - LTE
+     - NLTE
+     - Exact Jacobian
+     - Entropy Fix
+   * - ``AUSM``
+     - Yes
+     - Yes
+     - Yes
+     - Yes
+     - --
+   * - ``AUSM_PLUS``
+     - Yes
+     - Yes
+     - Yes
+     - --
+     - --
+   * - ``AUSM_PLUS_UP``
+     - Yes
+     - Yes
+     - Yes
+     - --
+     - --
+   * - ``AUSM_PLUS_UP2``
+     - Yes
+     - --
+     - Yes
+     - --
+     - --
+   * - ``ROE``
+     - Yes
+     - --
+     - Yes
+     - Yes
+     - HH 1st
+   * - ``ROE_IPC_WS``
+     - Yes
+     - --
+     - --
+     - --
+     - --
+   * - ``ROE_VPC_WS``
+     - Yes
+     - --
+     - --
+     - --
+     - --
+   * - ``VAN_LEER``
+     - Yes
+     - Yes
+     - Yes
+     - Yes
+     - --
+   * - ``SW``
+     - Yes
+     - --
+     - --
+     - --
+     - --
+   * - ``MOD_SW``
+     - Yes
+     - --
+     - Yes
+     - Yes
+     - --
+   * - ``HLLE``
+     - Yes
+     - --
+     - Yes
+     - --
+     - --
+   * - ``LF``
+     - Yes
+     - Yes
+     - Yes
+     - --
+     - --
+   * - Central/Hybrid
+     - Yes
+     - Yes
+     - Yes
+     - --
+     - --
+
+Schemes without an exact Jacobian fall back to finite-difference (``FD``) or
+approximate (``JAMESON``, ``POS_NEG_SPLIT``) Jacobians for implicit solvers.
+
+
+.. _flux-ausm:
+
+AUSM Family
+============
+
+The Advection Upstream Splitting Method (AUSM) family splits the numerical
+flux into convective (mass-flux) and pressure contributions, each computed
+independently.
+
+AUSM (Original)
+----------------
+
+.. admonition:: Reference
+   :class: tip
+
+   M.-S. Liou, *J. Comput. Phys.* **107**, 23--39 (1993).
+
+The original AUSM scheme splits the interface Mach number and pressure using
+polynomial functions of degree 1 and 2.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = AUSM
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_ausm.F90``
+- ``src/fluid_eu_ns_lte/EU_LTE_nflux_ausm.F90``
+- ``src/fluid_eu_ns_nlte/EU_NLTE_nflux_ausm.F90``
+
+**Jacobian:** Exact (``ausm_jac``).
+
+.. _flux-ausm-plus:
+
+AUSM+
+------
+
+.. admonition:: Reference
+   :class: tip
+
+   M.-S. Liou, *J. Comput. Phys.* **129**, 364--382 (1996).
+
+AUSM+ introduces 4th-degree polynomial splitting functions that guarantee
+positivity of the mass flux and exact resolution of isolated normal shocks.
+
+The interface Mach number and pressure are split independently:
+
+.. math::
+
+   M_{1/2} = \mathcal{M}^+(M_L) + \mathcal{M}^-(M_R), \qquad
+   p_{1/2} = \mathcal{P}^+(M_L)\,p_L + \mathcal{P}^-(M_R)\,p_R
+
+The numerical flux is then assembled as:
+
+.. math::
+
+   F_{1/2} = \dot{m}_{1/2}
+   \begin{cases}
+     \Phi_L & \text{if } \dot{m}_{1/2} \ge 0 \\
+     \Phi_R & \text{otherwise}
+   \end{cases}
+   + p_{1/2} \hat{n}
+
+where the mass flux includes the density:
+:math:`\dot{m}_{1/2} = M_{1/2}\,\rho_\text{upw}\,c_{1/2}` (upwind density
+selected by the sign of :math:`M_{1/2}`), and
+:math:`\Phi = (1,\; u,\; v,\; [w],\; H)^T` is the vector of convected
+quantities. The interface speed of sound :math:`c_{1/2}` is taken as the
+minimum of the left and right critical speeds of sound.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = AUSM_PLUS
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_ausm_plus.F90``
+- ``src/utils/utils_ausm.F90`` (split functions: ``get_inter_val_ausm_plus``)
+
+**Jacobian:** Finite-difference only.
+
+.. _flux-ausm-plus-up:
+
+AUSM+-up
+---------
+
+.. admonition:: Reference
+   :class: tip
+
+   M.-S. Liou, *J. Comput. Phys.* **214**, 137--170 (2006).
+
+AUSM+-up extends AUSM+ to all speed regimes by adding velocity and pressure
+diffusion terms scaled by the local Mach number:
+
+.. math::
+
+   M_{1/2} = \mathcal{M}^+(M_L) + \mathcal{M}^-(M_R)
+   - \frac{K_p}{f_a} \max\!\bigl(1 - \sigma\,\overline{M^2},\; 0\bigr)
+   \frac{p_R - p_L}{\bar{\rho}\,\bar{c}^2}
+
+where :math:`\overline{M^2} = \tfrac{1}{2}(M_L^2 + M_R^2)`,
+:math:`\bar{\rho} = \tfrac{1}{2}(\rho_L + \rho_R)`, and the scaling function
+:math:`f_a = M_0(2 - M_0)` with
+:math:`M_0 = \min\!\bigl(1,\;\max(\overline{M^2},\;M_\infty^2)\bigr)^{1/2}`.
+
+.. math::
+
+   p_{1/2} = \mathcal{P}^+(M_L)\,p_L + \mathcal{P}^-(M_R)\,p_R
+   - K_u\,\mathcal{P}^+\mathcal{P}^-\,(\rho_L + \rho_R)\,(f_a\,\bar{c})\,(u_R - u_L)
+
+Default parameters: :math:`K_p = 0.25`, :math:`K_u = 0.75`, :math:`\sigma = 1.0`.
+
+.. note::
+
+   In the pressure diffusion term, the code uses the **sum** of left and right
+   densities :math:`(\rho_L + \rho_R)` (not the average :math:`\bar{\rho}`)
+   and multiplies by the scaling function :math:`f_a`.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = AUSM_PLUS_UP
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_ausm_plus_up.F90``
+- ``src/utils/utils_ausm.F90`` (``get_inter_val_ausm_plus_up``)
+
+**Jacobian:** Finite-difference only.
+
+.. _flux-ausm-plus-up2:
+
+AUSM+-up2
+----------
+
+.. admonition:: Reference
+   :class: tip
+
+   K. Kitamura, E. Shima, *J. Comput. Phys.* **245**, 62--83 (2013).
+
+AUSM+-up2 modifies the pressure flux to eliminate a numerical shock instability
+(carbuncle phenomenon) that can occur with AUSM+-up on high-aspect-ratio grids
+in hypersonic flow. The Mach number splitting is identical to AUSM+-up. The
+pressure flux uses a SLAU2-style formulation:
+
+.. math::
+
+   p_{1/2} = \frac{1}{2}\Bigl[(p_L + p_R)
+   + (\mathcal{P}^+ - \mathcal{P}^-)(p_L - p_R)\Bigr]
+   + \sqrt{\overline{e_k}}\,
+   (\mathcal{P}^+ + \mathcal{P}^- - 1)\,\bar{\rho}\,\bar{c}
+
+where :math:`\overline{e_k} = \tfrac{1}{2}(e_{k,L} + e_{k,R})` is the
+average specific kinetic energy, and the term
+:math:`(\mathcal{P}^+ + \mathcal{P}^- - 1)` acts as a pressure-velocity
+coupling that activates near shocks.
+
+.. note::
+
+   The AUSM+-up2 pressure term in HEGEL follows the SLAU2 formulation of
+   Kitamura and Shima rather than a simple modification of the AUSM+-up
+   pressure diffusion.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = AUSM_PLUS_UP2
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_ausm_plus_up2.F90``
+- ``src/fluid_eu_ns_nlte/EU_NLTE_nflux_ausm_plus_up2.F90``
+
+**Jacobian:** Finite-difference only.
+
+.. note::
+
+   Not available for LTE models. Use ``AUSM_PLUS_UP`` instead.
+
+
+.. _flux-roe:
+
+Roe Family
+==========
+
+Roe Approximate Riemann Solver
+-------------------------------
+
+.. admonition:: Reference
+   :class: tip
+
+   P. L. Roe, *J. Comput. Phys.* **43**, 357--372 (1981).
+
+Roe's method linearises the Riemann problem about a special averaged state
+(the Roe average) that satisfies the property
+:math:`F_R - F_L = \hat{A}(U_R - U_L)`:
+
+.. math::
+
+   F_{1/2} = \frac{1}{2}\bigl(F_L + F_R\bigr)
+   - \frac{1}{2} \sum_{k=1}^{N} |\hat{\lambda}_k| \Delta \hat{w}_k \hat{r}_k
+
+where :math:`\hat{\lambda}_k`, :math:`\hat{r}_k` are the eigenvalues and
+right eigenvectors of the Roe matrix, and :math:`\Delta\hat{w}_k` are the wave
+strengths.
+
+An entropy fix (Harten-Hyman 1st order) is applied to prevent expansion
+shocks at sonic points. The 1st-order fix replaces eigenvalues that fall
+below a threshold with the threshold value itself:
+
+.. math::
+
+   |\hat{\lambda}| \to
+   \begin{cases}
+     \delta & |\hat{\lambda}| < \delta \\
+     |\hat{\lambda}| & \text{otherwise}
+   \end{cases}
+
+with :math:`\delta = \max(0,\; \hat{\lambda} - \lambda_L,\; \lambda_R - \hat{\lambda})`.
+
+A 2nd-order variant (``HH_2nd_entropy_fix``) using the smooth quadratic
+formula :math:`(\hat{\lambda}^2 + \delta^2)/(2\delta)` is also available in
+the codebase but is not used by default.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = ROE
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_roe.F90`` (``roe_flux``, ``roe_jac``)
+- ``src/fluid_eu_ns/EU_nflux_roe_utils.F90`` (``roe_avg_state``, ``roe_diss_term``)
+- ``src/fluid_eu_ns_nlte/EU_NLTE_nflux_roe.F90``
+- ``src/utils/utils_entropy_fix.F90`` (``HH_1st_entropy_fix``, ``HH_2nd_entropy_fix``)
+
+**Jacobian:** Exact (``roe_jac``).
+
+.. _flux-roe-pc:
+
+Preconditioned Roe (Weiss-Smith)
+---------------------------------
+
+.. admonition:: Reference
+   :class: tip
+
+   J. M. Weiss, W. A. Smith, *AIAA J.* **33**, 2050--2057 (1995).
+
+Low-Mach preconditioning modifies the dissipation term of the Roe flux using
+the Weiss-Smith preconditioning matrix :math:`\Gamma`:
+
+.. math::
+
+   F_{1/2} = \frac{1}{2}(F_L + F_R) - \frac{1}{2}|\Gamma^{-1} A| (U_R - U_L)
+
+Two variants are available:
+
+- **Inviscid preconditioning** (``ROE_IPC_WS``): applies only to convective
+  eigenvalues.
+- **Viscous preconditioning** (``ROE_VPC_WS``): also modifies the viscous
+  time-step scaling.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX       = ROE_IPC_WS   # or ROE_VPC_WS
+   FLUID_M_INF    = 0.3          # reference Mach for preconditioning
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_roe_pc.F90`` (``roe_IPC_WS_flux``, ``roe_VPC_WS_flux``)
+- ``src/fluid_eu_ns/EU_nflux_roe_utils_pc.F90`` (``roe_WS_diss_term``)
+
+**Jacobian:** Finite-difference only.
+
+.. warning::
+
+   Only available for the EU/NS (calorically perfect gas) model. Not
+   implemented for LTE or NLTE.
+
+See also :ref:`preconditioning`.
+
+
+.. _flux-van-leer:
+
+Van Leer Flux-Vector Splitting
+==============================
+
+.. admonition:: Reference
+   :class: tip
+
+   B. van Leer, *J. Comput. Phys.* **32**, 101--136 (1979).
+
+The van Leer scheme splits the physical flux :math:`F(U)` into forward
+(:math:`F^+`) and backward (:math:`F^-`) components based on the sign of the
+local Mach number.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = VAN_LEER
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_van_leer.F90``
+- ``src/fluid_eu_ns_lte/EU_LTE_nflux_van_leer.F90``
+- ``src/fluid_eu_ns_nlte/EU_NLTE_nflux_van_leer.F90``
+
+**Jacobian:** Exact (``van_leer_jac``).
+
+
+.. _flux-hlle:
+
+HLLE
+====
+
+.. admonition:: Reference
+   :class: tip
+
+   B. Einfeldt et al., *J. Comput. Phys.* **92**, 273--295 (1991).
+
+The HLLE scheme uses two-wave estimates for the bounding signal speeds
+:math:`S_L, S_R`:
+
+.. math::
+
+   F_{1/2} = \frac{S_R F_L - S_L F_R + S_L S_R (U_R - U_L)}{S_R - S_L}
+
+Positivity-preserving but diffusive at contact discontinuities.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = HLLE
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_hlle.F90``
+- ``src/fluid_eu_ns_nlte/EU_NLTE_nflux_hlle.F90``
+
+**Jacobian:** Finite-difference only.
+
+.. note::
+
+   Not available for LTE models.
+
+
+.. _flux-steger-warming:
+
+Steger-Warming
+==============
+
+.. admonition:: Reference
+   :class: tip
+
+   J. L. Steger, R. F. Warming, *J. Comput. Phys.* **40**, 263--293 (1981).
+
+Flux-vector splitting based on the homogeneity property :math:`F = AU`.
+Conceptually the flux Jacobian is split as
+:math:`A^\pm = R \Lambda^\pm R^{-1}`, giving :math:`F_{1/2} = F^+(U_L) + F^-(U_R)`.
+The implementation computes the split fluxes directly from the eigenvalues
+:math:`\lambda^\pm = \tfrac{1}{2}(\lambda \pm |\lambda|)` without forming the
+matrices :math:`R`, :math:`\Lambda`, :math:`R^{-1}` explicitly.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = SW
+
+**Source files:** ``src/fluid_eu_ns/EU_nflux_steger_warming.F90``
+
+**Jacobian:** Finite-difference only.
+
+.. note::
+
+   Only available for EU/NS model. Consider ``MOD_SW`` for reduced dissipation.
+
+
+.. _flux-mod-steger-warming:
+
+Modified Steger-Warming
+=======================
+
+An improved variant of Steger-Warming with reduced numerical dissipation at
+contact discontinuities. Provides flux matrices :math:`A^+, A^-` that can be
+used directly by characteristic-based reconstruction.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = MOD_SW
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_mod_steger_warming.F90``
+- ``src/fluid_eu_ns_nlte/EU_NLTE_nflux_mod_steger_warming.F90``
+
+**Jacobian:** Exact (``mod_steger_warming_flux_jac``).
+
+
+.. _flux-lax-friedrichs:
+
+Lax-Friedrichs
+===============
+
+The simplest upwind-type flux, using the maximum local spectral radius over
+both left and right states,
+:math:`\alpha = \max(|V_{n,L}| + c_L,\; |V_{n,R}| + c_R)`, as dissipation
+coefficient:
+
+.. math::
+
+   F_{1/2} = \frac{1}{2}(F_L + F_R) - \frac{\alpha}{2}(U_R - U_L)
+
+Maximally diffusive. Useful as a baseline or for debugging.
+
+**Input:**
+
+.. code-block:: none
+
+   NUM_FLUX = LF
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_lax_friedrichs.F90``
+- ``src/fluid_eu_ns_lte/EU_LTE_nflux_lax_friedrichs.F90``
+- ``src/fluid_eu_ns_nlte/EU_NLTE_nflux_lax_friedrichs.F90``
+
+**Jacobian:** Finite-difference only.
+
+
+.. _flux-hybrid:
+
+Central and Hybrid Schemes
+==========================
+
+Skew-Symmetric (Ducros) Central Flux
+--------------------------------------
+
+Non-dissipative, energy-conserving central fluxes based on the skew-symmetric
+formulation of Ducros et al. Available in 2nd and 4th order.
+
+**Input keywords:**
+
+.. code-block:: none
+
+   NUM_FLUX = SKEW_SYM2       # 2nd-order, uniform grid
+   NUM_FLUX = SKEW_SYM4       # 4th-order, uniform grid
+   NUM_FLUX = SKEW_SYM2_NU    # 2nd-order, non-uniform grid
+   NUM_FLUX = SKEW_SYM4_NU    # 4th-order, non-uniform grid
+
+**Source files:**
+
+- ``src/fluid/fluid_model_flux_skew_sym.F90`` (``skew_sym_flux2``, ``skew_sym_flux4``, ``skew_sym_flux_nu``)
+- ``src/fluid/fluid_model_flux_central.F90`` (dispatch wrapper)
+
+.. warning::
+
+   Pure central schemes are non-dissipative and will produce oscillations near
+   discontinuities. Use the blended variant below for practical simulations.
+
+Blended Upwind-Central
+-----------------------
+
+Blends an upwind flux with a central (skew-symmetric) flux using a
+sensor-based parameter :math:`\phi`:
+
+.. math::
+
+   F_{1/2} = \phi \, F_\text{central} + (1 - \phi) \, F_\text{upwind}
+
+The blending parameter is obtained from the Ducros shock sensor
+(``get_Phi_up_central``), which drives :math:`\phi \to 0` near shocks
+(upwind) and :math:`\phi \to 1` in smooth regions (central).
+
+**Input keywords:**
+
+.. code-block:: none
+
+   NUM_FLUX = BLEND_UP_SKEW_SYM2       # 2nd-order central component
+   NUM_FLUX = BLEND_UP_SKEW_SYM4       # 4th-order central component
+   NUM_FLUX = BLEND_UP_SKEW_SYM2_NU    # non-uniform grid variants
+   NUM_FLUX = BLEND_UP_SKEW_SYM4_NU
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_central_upwind.F90`` (``upwind_central_flux``)
+- ``src/fluid_eu_ns_lte/EU_LTE_nflux_central_upwind.F90``
+- ``src/fluid_eu_ns_nlte/EU_NLTE_nflux_central_upwind.F90``
+
+
+Flux Jacobian Approximations
+=============================
+
+For implicit time integration, HEGEL requires the Jacobian
+:math:`\partial F / \partial U` of the numerical flux. Three approximation
+strategies are available, selected via the ``NUM_FLUX_JAC`` keyword:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 30 50
+
+   * - Keyword
+     - Method
+     - Notes
+   * - (scheme-specific)
+     - Exact Jacobian
+     - Available for ``ROE``, ``AUSM``, ``VAN_LEER``, ``MOD_SW``
+   * - ``JAMESON``
+     - Jameson scalar dissipation
+     - Diagonal Jacobian; cheap but approximate
+   * - ``POS_NEG_SPLIT``
+     - :math:`A^+/A^-` splitting
+     - Uses eigenvalue-based splitting of the flux Jacobian
+   * - ``FD``
+     - Finite difference
+     - :math:`\partial F/\partial U \approx [F(U+\epsilon) - F(U)]/\epsilon`, :math:`\epsilon = 10^{-5}`
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_nflux_approx_jac.F90`` (``jameson_jac``, ``pos_neg_split_jac``)
+- ``src/fluid_eu_ns/EU_nflux_fd_jac.F90`` (``fd_jac``)
+- Analogous files in ``fluid_eu_ns_lte/`` and ``fluid_eu_ns_nlte/``
+
+**Example (implicit with Jameson Jacobian):**
+
+.. code-block:: none
+
+   NUM_FLUX     = AUSM_PLUS
+   NUM_FLUX_JAC = JAMESON
+   NUM_TIME_INT = BE
+   NUM_LHS_JAC  = FULL

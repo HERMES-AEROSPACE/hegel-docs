@@ -1,0 +1,518 @@
+.. _boundary-conditions:
+
+====================
+Boundary Conditions
+====================
+
+HEGEL supports a comprehensive set of boundary conditions for inviscid
+(Euler) and viscous (Navier-Stokes) flows. Boundary conditions are specified
+in a separate BC file referenced from the main input file.
+
+.. contents:: On this page
+   :local:
+   :depth: 2
+
+
+Summary
+=======
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 8 15 52
+
+   * - Keyword
+     - ID
+     - Applies To
+     - Description
+   * - ``SYMMETRY``
+     - 1
+     - EU/NS
+     - Slip wall / symmetry plane
+   * - ``NO_SLIP_WALL_ISO``
+     - 2
+     - NS
+     - Isothermal no-slip wall
+   * - ``NO_SLIP_WALL_ISO_GSI``
+     - 3
+     - NS (NLTE)
+     - Isothermal wall with gas-surface interactions
+   * - ``NO_SLIP_WALL_AD``
+     - 4
+     - NS
+     - Adiabatic no-slip wall
+   * - ``MOV_NO_SLIP_WALL_AD``
+     - 5
+     - NS
+     - Moving adiabatic wall
+   * - ``NO_SLIP_RAD_EQ_WALL``
+     - 6
+     - NS
+     - Radiative equilibrium wall
+   * - ``NO_SLIP_RAD_EQ_WALL_GSI``
+     - 7
+     - NS (NLTE)
+     - Radiative equilibrium wall with GSI
+   * - ``BLOW_WALL``
+     - 8
+     - NS
+     - Blowing (mass injection) wall
+   * - ``NO_SLIP_WALL_AD_TINT``
+     - 9
+     - NS (NLTE)
+     - Isothermal/adiabatic mixed-mode wall
+   * - ``FARFIELD``
+     - 10
+     - EU
+     - Characteristic-based farfield
+   * - ``SUB_IN``
+     - 20
+     - EU/NS
+     - Subsonic inlet (static P, T)
+   * - ``SUB_IN_TOT``
+     - 21
+     - EU/NS
+     - Subsonic inlet (total P0, T0)
+   * - ``SUB_IN_MDOT``
+     - 22
+     - EU/NS
+     - Subsonic inlet (mass flow rate)
+   * - ``SUB_OUT``
+     - 23
+     - EU/NS
+     - Subsonic outlet (static P)
+   * - ``SUB_IN_OUT``
+     - 24
+     - NS
+     - Ambivalent inlet/outlet
+   * - ``SUP_IN``
+     - 30
+     - EU/NS
+     - Supersonic inlet (all specified)
+   * - ``SUP_OUT``
+     - 31
+     - EU/NS
+     - Supersonic outlet (all extrapolated)
+
+**Data constants:** ``src/data/data_bc_proc.F90``
+
+
+Inviscid (Euler) Boundary Conditions
+=====================================
+
+Symmetry / Slip Wall
+---------------------
+
+Reflects the normal velocity component while preserving tangential components
+and thermodynamic state. Used for symmetry planes and inviscid walls.
+
+.. code-block:: none
+
+   BC_TYPE = SYMMETRY
+
+No parameters required.
+
+Farfield
+--------
+
+Characteristic-based treatment for farfield boundaries. Incoming
+characteristics are set from freestream conditions; outgoing characteristics
+are extrapolated from the interior.
+
+.. code-block:: none
+
+   BC_TYPE = FARFIELD
+
+**Parameters:** Freestream density, velocity, pressure.
+
+**Source:** ``src/fluid_eu_ns/EU_bc_face_farfield.F90``
+
+Supersonic Inlet / Outlet
+--------------------------
+
+At a **supersonic inlet**, all characteristics enter the domain --- all flow
+variables are specified from boundary data:
+
+.. code-block:: none
+
+   BC_TYPE = SUP_IN
+
+At a **supersonic outlet**, all characteristics leave the domain ---
+all variables are extrapolated (zero-gradient):
+
+.. code-block:: none
+
+   BC_TYPE = SUP_OUT
+
+
+Subsonic Inlet / Outlet
+========================
+
+Subsonic Inlet (Static Conditions)
+------------------------------------
+
+.. admonition:: Reference
+   :class: tip
+
+   D. L. Whitfield, J. M. Janus, *AIAA Paper 84-1552* (1984).
+
+Imposes static pressure and temperature. Density extrapolated from interior.
+
+.. code-block:: none
+
+   BC_TYPE = SUB_IN
+   P       = 101325.0
+   T       = 300.0
+
+**Source:** ``src/fluid_eu_ns/EU_bc_face_in.F90``
+
+Subsonic Inlet (Total Conditions)
+----------------------------------
+
+.. admonition:: Reference
+   :class: tip
+
+   J. R. Carlson, *NASA/TM-2011-217181* (2011).
+
+Imposes total (stagnation) pressure and temperature. Flow direction derived
+from interior characteristics.
+
+.. code-block:: none
+
+   BC_TYPE = SUB_IN_TOT
+   P0      = 200000.0
+   T0      = 500.0
+
+**Source:** ``src/fluid_eu_ns/EU_bc_face_in_tot.F90``
+
+Subsonic Inlet (Mass Flow Rate)
+--------------------------------
+
+Imposes mass flow rate and temperature. Useful for combustor and ICP torch
+inlets.
+
+.. code-block:: none
+
+   BC_TYPE  = SUB_IN_MDOT
+   MDOT     = 0.5
+   T        = 300.0
+
+For multi-species (NLTE): additional ``RHOI`` or ``XI`` parameters specify
+species composition.
+
+**Source:** ``src/fluid_eu_ns/EU_bc_face_in_mdot.F90``
+
+Subsonic Outlet
+----------------
+
+Imposes static back-pressure; all other quantities extrapolated from interior.
+
+.. code-block:: none
+
+   BC_TYPE = SUB_OUT
+   P       = 101325.0
+
+**Source:** ``src/fluid_eu_ns/EU_bc_face_out.F90``
+
+Ambivalent Inlet/Outlet
+-------------------------
+
+Dynamically switches between inlet and outlet behaviour based on local flow
+direction. Useful when the flow direction at the boundary is not known
+*a priori* (e.g., separated regions).
+
+.. code-block:: none
+
+   BC_TYPE = SUB_IN_OUT
+   P0      = 200000.0
+   T0      = 500.0
+   P       = 101325.0
+
+**Source:** ``src/fluid_eu_ns/EU_bc_face_in_out.F90``
+
+
+Viscous (Navier-Stokes) Wall Conditions
+========================================
+
+Isothermal No-Slip Wall
+-------------------------
+
+Velocity set to zero; wall temperature specified; pressure extrapolated.
+
+.. code-block:: none
+
+   BC_TYPE = NO_SLIP_WALL_ISO
+   T       = 300.0
+
+**Source:** ``src/fluid_eu_ns/NS_bc_face_wall_iso.F90``
+
+Adiabatic No-Slip Wall
+------------------------
+
+Velocity set to zero; zero heat flux at wall. Temperature recovers to the
+adiabatic wall temperature.
+
+.. code-block:: none
+
+   BC_TYPE = NO_SLIP_WALL_AD
+
+No additional parameters.
+
+Isothermal Wall with Gas-Surface Interactions (NLTE)
+------------------------------------------------------
+
+No-slip wall with catalytic surface reactions. Species composition at the
+wall is determined by surface chemistry. Requires NLTE fluid model.
+
+.. code-block:: none
+
+   BC_TYPE = NO_SLIP_WALL_ISO_GSI
+   T       = 1500.0
+
+**Source:** ``src/fluid_eu_ns_nlte/NS_NLTE_bc_face_wall_iso_gsi.F90``
+
+Mixed Isothermal/Adiabatic Wall (NLTE)
+----------------------------------------
+
+Translational temperature set to wall value (isothermal); vibrational and
+electronic temperatures set to adiabatic recovery. Decouples temperature
+modes at the wall.
+
+.. code-block:: none
+
+   BC_TYPE = NO_SLIP_WALL_AD_TINT
+   T       = 1000.0
+
+**Source:** ``src/fluid_eu_ns_nlte/NS_NLTE_bc_face_wall_iso_ad.F90``
+
+Moving Adiabatic Wall
+----------------------
+
+No-slip wall with prescribed wall velocity.
+
+.. code-block:: none
+
+   BC_TYPE = MOV_NO_SLIP_WALL_AD
+   VEL     = 100.0  0.0  0.0
+
+**Source:** ``src/fluid_eu_ns/NS_bc_face_wall_mov.F90``
+
+Blowing Wall (Mass Injection)
+------------------------------
+
+Wall with prescribed normal velocity (transpiration). Used for ablation
+modelling and film cooling.
+
+.. code-block:: none
+
+   BC_TYPE = BLOW_WALL
+   VEL     = 0.0  0.1  0.0
+   T       = 2000.0
+
+For NLTE: add species composition with ``RHOI`` or ``XI``.
+
+**Source:** ``src/fluid_eu_ns/NS_bc_face_wall_blow.F90``
+
+Radiative Equilibrium Wall
+----------------------------
+
+Wall temperature determined by the balance between conductive heat flux to
+the wall and radiative emission:
+
+.. math::
+
+   q_\text{cond} = \epsilon \sigma (T_w^4 - T_\text{ext}^4)
+
+.. code-block:: none
+
+   BC_TYPE  = NO_SLIP_RAD_EQ_WALL
+   EMIS     = 0.85
+   TEMP_EXT = 300.0
+
+**Source:** ``src/fluid_eu_ns/NS_bc_face_wall_rad_eq.F90``
+
+Radiative Equilibrium Wall with GSI (NLTE)
+-------------------------------------------
+
+Combines radiative equilibrium temperature with catalytic surface chemistry.
+
+.. code-block:: none
+
+   BC_TYPE  = NO_SLIP_RAD_EQ_WALL_GSI
+   EMIS     = 0.85
+
+**Source:** ``src/fluid_eu_ns_nlte/NS_NLTE_bc_face_wall_rad_eq_gsi.F90``
+
+
+.. _lodi-bcs:
+
+LODI Non-Reflecting Boundary Conditions
+========================================
+
+.. admonition:: Reference
+   :class: tip
+
+   E. Motheau, Y. Mery, F. Nicoud, T. Poinsot, *AIAA J.* **55** (10), 2017.
+
+   K. W. Thompson, *J. Comput. Phys.* **68**, 1--24 (1987).
+
+The LODI (Locally One-Dimensional Inviscid) approach uses characteristic
+decomposition to construct non-reflecting boundary conditions. Ghost-cell
+values are set such that incoming wave amplitudes are relaxed toward target
+conditions while outgoing waves pass freely.
+
+LODI boundary conditions are essential for subsonic problems where spurious
+wave reflections from boundaries contaminate the interior solution (e.g., jet
+simulations, acoustic problems, unsteady flows).
+
+LODI Parameters
+----------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 15 70
+
+   * - Keyword
+     - Default
+     - Description
+   * - ``SIGMA``
+     - --
+     - Relaxation coefficient for incoming characteristics
+   * - ``LREF``
+     - --
+     - Reference length (domain size in normal direction)
+   * - ``BETA``
+     - --
+     - Relaxation coefficient (compressible waves)
+   * - ``BETA_VIS``
+     - --
+     - Relaxation coefficient (viscous/transverse terms)
+
+LODI Inlet and Outlet
+-----------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 8 67
+
+   * - Keyword
+     - ID
+     - Description
+   * - ``SUB_IN_LODI``
+     - -10
+     - Subsonic inlet with LODI (1D/2D)
+   * - ``SUB_IN_TOT_LODI``
+     - -11
+     - Subsonic inlet with total conditions (LODI)
+   * - ``SUB_OUT_LODI``
+     - -12
+     - Subsonic outlet with LODI (1D/2D)
+
+**Example (non-reflecting outlet):**
+
+.. code-block:: none
+
+   BC_TYPE = SUB_OUT_LODI
+   P       = 101325.0
+   SIGMA   = 0.25
+   LREF    = 0.1
+   BETA    = 0.5
+
+**Source files:**
+
+- 1D: ``src/fluid_eu_ns/EU_bc_lodi_face_1d_in.F90``, ``EU_bc_lodi_face_1d_out.F90``
+- 2D: ``src/fluid_eu_ns/EU_bc_lodi_face_2d_in.F90``, ``EU_bc_lodi_face_2d_out.F90``
+- NS: ``src/fluid_eu_ns/NS_bc_lodi_face_2d_in.F90``, ``NS_bc_lodi_face_2d_out.F90``
+- LTE: ``src/fluid_eu_ns_lte/NS_LTE_bc_lodi_face_2d_*.F90``
+- Utility: ``src/utils/utils_bc_lodi.F90``
+
+
+LODI Corner/Edge Conditions
+-----------------------------
+
+Where two LODI boundaries meet, special corner (2D) or edge (3D) treatments
+are needed:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 8 62
+
+   * - Keyword
+     - ID
+     - Description
+   * - ``SUB_IN_LODI_WALL_GC``
+     - -1
+     - Inlet + isothermal wall corner
+   * - ``SUB_IN_LODI_SYM_GC``
+     - -2
+     - Inlet + symmetry corner
+   * - ``SUB_IN_OUT_LODI_GC``
+     - -3
+     - Inlet + outlet corner
+   * - ``SUB_OUT_LODI_GC``
+     - -4
+     - Outlet + outlet corner
+   * - ``SUB_OUT_LODI_WALL_GC``
+     - -5
+     - Outlet + isothermal wall corner
+   * - ``SUB_OUT_LODI_SYM_GC``
+     - -6
+     - Outlet + symmetry corner
+
+**Source files:** ``src/fluid_eu_ns/NS_bc_lodi_corner_2d_*.F90``
+
+
+Non-LODI Corner/Edge Conditions
+---------------------------------
+
+Standard (non-LODI) ghost-cell treatments for 2D corners and 3D edges:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 8 67
+
+   * - Keyword
+     - ID
+     - Description
+   * - ``IN_SYM_GC``
+     - 0
+     - Inlet + symmetry corner
+   * - ``IN_WALL_GC``
+     - 1
+     - Inlet + wall corner
+   * - ``IN_OUT_GC``
+     - 2
+     - Inlet + outlet corner
+   * - ``OUT_GC``
+     - 3
+     - Outlet + outlet corner
+   * - ``OUT_SYM_GC``
+     - 4
+     - Outlet + symmetry corner
+   * - ``OUT_WALL_GC``
+     - 5
+     - Outlet + wall corner
+   * - ``WALL_SYM_GC``
+     - 6
+     - Wall + symmetry corner
+   * - ``WALL_GC``
+     - 7
+     - Wall + wall corner
+   * - ``SYM_GC``
+     - 8
+     - Symmetry + symmetry corner
+
+
+Internal Boundaries
+===================
+
+Block Interface
+----------------
+
+Internal boundary between computational blocks in a multi-block grid.
+Handled automatically by the grid module --- not set by the user.
+
+.. code-block:: none
+
+   BC_TYPE = BLOCK_INTERFACE   # ID = -200
+
+Ghost cell data is exchanged via MPI for inter-processor block interfaces.

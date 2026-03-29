@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Software Architecture &mdash; HEGEL 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Development" href="development.html" />
+    <link rel="prev" title="Input Parameter Reference" href="numerical_schemes/input_reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            HEGEL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#required-packages">Required Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#optional-dependencies">Optional Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#building-petsc">Building PETSc</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#building-hegel-with-autotools">Building HEGEL with Autotools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#step-1-bootstrap">Step 1: Bootstrap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#step-2-configure">Step 2: Configure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#step-3-build-and-install">Step 3: Build and Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#step-4-environment-setup">Step 4: Environment Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-a-case">Running a Case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#running-hegel">Running HEGEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#available-test-cases">Available Test Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#configure-options-for-fluid-models">Configure Options for Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#optional-library-integration">Optional Library Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#typical-simulation-workflow">Typical Simulation Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide.html#output-formats">Output Formats</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory &amp; Physics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#design-philosophy">Design Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#fluid-models">Fluid Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#multi-physics-coupling">Multi-Physics Coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#demonstrated-applications">Demonstrated Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="physics.html">Physics and Numerical Methods</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="physics.html#governing-equations">Governing Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physics.html#space-discretization">Space Discretization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physics.html#inviscid-flux">Inviscid Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physics.html#diffusive-flux">Diffusive Flux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physics.html#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physics.html#time-integration">Time Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physics.html#grid-system">Grid System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physics.html#solution-strategy-for-steady-state-problems">Solution Strategy for Steady-State Problems</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Numerical Schemes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="numerical_schemes/index.html">Numerical Schemes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="numerical_schemes/index.html#quick-reference">Quick Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="numerical_schemes/flux_schemes.html">Flux Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#availability-matrix">Availability Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#ausm-family">AUSM Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#roe-family">Roe Family</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#van-leer-flux-vector-splitting">Van Leer Flux-Vector Splitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#hlle">HLLE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#steger-warming">Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#modified-steger-warming">Modified Steger-Warming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#lax-friedrichs">Lax-Friedrichs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#central-and-hybrid-schemes">Central and Hybrid Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/flux_schemes.html#flux-jacobian-approximations">Flux Jacobian Approximations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="numerical_schemes/time_integration.html">Time Integration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/time_integration.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/time_integration.html#explicit-methods">Explicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/time_integration.html#implicit-methods">Implicit Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/time_integration.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/time_integration.html#run-modes-and-cfl-control">Run Modes and CFL Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/time_integration.html#petsc-linear-solver-options">PETSc Linear Solver Options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="numerical_schemes/spatial_discretization.html">Spatial Discretization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/spatial_discretization.html#reconstruction-procedures">Reconstruction Procedures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/spatial_discretization.html#reconstruction-variable-sets">Reconstruction Variable Sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/spatial_discretization.html#slope-limiters">Slope Limiters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/spatial_discretization.html#reconstruction-availability-by-model">Reconstruction Availability by Model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="numerical_schemes/boundary_conditions.html">Boundary Conditions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/boundary_conditions.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/boundary_conditions.html#inviscid-euler-boundary-conditions">Inviscid (Euler) Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/boundary_conditions.html#subsonic-inlet-outlet">Subsonic Inlet / Outlet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/boundary_conditions.html#viscous-navier-stokes-wall-conditions">Viscous (Navier-Stokes) Wall Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/boundary_conditions.html#lodi-non-reflecting-boundary-conditions">LODI Non-Reflecting Boundary Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/boundary_conditions.html#internal-boundaries">Internal Boundaries</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="numerical_schemes/source_terms.html">Source Terms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/source_terms.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/source_terms.html#geometric-source-terms">Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/source_terms.html#viscous-geometric-source-terms">Viscous Geometric Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/source_terms.html#chemical-kinetics-source-terms">Chemical Kinetics Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/source_terms.html#electromagnetic-source-terms">Electromagnetic Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/source_terms.html#radiation-source-terms">Radiation Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/source_terms.html#verification-source-terms">Verification Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/source_terms.html#sponge-layers">Sponge Layers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="numerical_schemes/preconditioning.html">Preconditioning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/preconditioning.html#available-preconditioners">Available Preconditioners</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/preconditioning.html#weiss-smith-preconditioning">Weiss-Smith Preconditioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/preconditioning.html#input-settings">Input Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/preconditioning.html#compatibility">Compatibility</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/preconditioning.html#grid-adaptation">Grid Adaptation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="numerical_schemes/input_reference.html">Input Parameter Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#fluid-model-selection">Fluid Model Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#numerical-flux">Numerical Flux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#reconstruction">Reconstruction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#time-integration">Time Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#dual-time-stepping">Dual-Time Stepping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#linear-solver-petsc-ksp">Linear Solver (PETSc KSP)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#source-terms">Source Terms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#grid-adaptation">Grid Adaptation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#complete-input-file-example">Complete Input File Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="numerical_schemes/input_reference.html#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Software Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-class-structure">Main Class Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source-directory-structure">Source Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multi-block-parallelization">Multi-Block Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coupling-architecture">Coupling Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build-system">Build System</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#ci-cd">CI/CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_fortran.html">Fortran API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_fortran.html#key-modules">Key Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_doxygen.html">Doxygen API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_doxygen.html#source-files">Source Files</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HEGEL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Software Architecture</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/architecture.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="software-architecture">
+<h1>Software Architecture<a class="headerlink" href="#software-architecture" title="Link to this heading"></a></h1>
+<p>HEGEL is written in modern Fortran 2008 and is designed in an object-oriented
+(OO) fashion. The code is parallelized using MPI and the data structures
+provided by the PETSc library to distribute data across processors.</p>
+<section id="main-class-structure">
+<h2>Main Class Structure<a class="headerlink" href="#main-class-structure" title="Link to this heading"></a></h2>
+<p>The main class, <code class="docutils literal notranslate"><span class="pre">solver</span></code>, contains all the principal user-defined
+types/classes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sim_control</span></code> — Stores options specified via the input file and runtime
+information (e.g., interactive CFL number, time, number of iterations)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grid</span></code> — Stores all grid-related information</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grid_adapt</span></code> and <code class="docutils literal notranslate"><span class="pre">grid_refine</span></code> — Allow for runtime grid modification
+such as shock adaptation for blunt body simulations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">physical_model</span></code> — Contains all information related to the physics of the
+problem (e.g., fluid model and corresponding field variables)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sol_init</span></code> — Initializes the flowfield for common configurations such as
+blunt bodies, jets, and nozzles</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sol_post</span></code> — Provides methods for solution post-processing</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">coupler</span></code> — Responsible for data exchange with other solvers for
+multi-physics simulations (compiled when <code class="docutils literal notranslate"><span class="pre">HEGEL_HAVE_PRECICE</span></code> is defined)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time_integrator</span></code> — A polymorphic variable that handles the time
+integration of the space-discretized equations. Being polymorphic, it can
+reference different integrator types (explicit, implicit, IMEX)</p></li>
+</ul>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">type </span><span class="n">solver</span>
+<span class="w">    </span><span class="k">private</span>
+<span class="k">    type</span><span class="p">(</span><span class="n">sim_control</span><span class="p">)</span><span class="w">                    </span><span class="kd">::</span><span class="w"> </span><span class="n">simulation</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="w">                           </span><span class="kd">::</span><span class="w"> </span><span class="n">mesh</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">grid_adapt</span><span class="p">)</span><span class="w">                     </span><span class="kd">::</span><span class="w"> </span><span class="n">mesh_adapt</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">grid_refine</span><span class="p">)</span><span class="w">                    </span><span class="kd">::</span><span class="w"> </span><span class="n">mesh_refine</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">physical_model</span><span class="p">)</span><span class="w">                 </span><span class="kd">::</span><span class="w"> </span><span class="n">physics</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">sol_init</span><span class="p">)</span><span class="w">                       </span><span class="kd">::</span><span class="w"> </span><span class="n">initializer</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">sol_post</span><span class="p">)</span><span class="w">                       </span><span class="kd">::</span><span class="w"> </span><span class="n">post_processor</span>
+<span class="cp">#ifdef HEGEL_HAVE_PRECICE</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">coupler</span><span class="p">)</span><span class="w">                        </span><span class="kd">::</span><span class="w"> </span><span class="n">code_coupler</span>
+<span class="cp">#endif</span>
+<span class="w">    </span><span class="k">class</span><span class="p">(</span><span class="n">time_integrator</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">integrator</span>
+<span class="k">contains</span>
+<span class="w">    </span><span class="c">! Type-bound procedures (methods)</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="k">end type</span>
+</pre></div>
+</div>
+</section>
+<section id="source-directory-structure">
+<h2>Source Directory Structure<a class="headerlink" href="#source-directory-structure" title="Link to this heading"></a></h2>
+<p>The source code under <code class="docutils literal notranslate"><span class="pre">src/</span></code> is organized as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">main/</span></code> — Program entry point and driver</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fluid/</span></code> — Core fluid solver infrastructure</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fluid_eu_ns/</span></code> — Euler/Navier-Stokes (calorically perfect gas)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fluid_eu_ns_lte/</span></code> — Euler/Navier-Stokes with LTE thermochemistry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fluid_eu_ns_nlte/</span></code> — Euler/Navier-Stokes with NLTE thermochemistry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fluid_icp_lte/</span></code> — ICP with LTE thermochemistry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fluid_icp_nlte/</span></code> — ICP with NLTE thermochemistry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grid/</span></code> — Grid data structures and I/O</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grid_gen/</span></code> — Grid generation utilities</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grid_adapt/</span></code> — Grid adaptation (shock alignment)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grid_refine/</span></code> — Grid refinement</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">field/</span></code> — Field variable management</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">field_interp/</span></code> — Field interpolation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sol_init/</span></code> — Solution initialization</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sol_post/</span></code> — Solution post-processing and output</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">physics/</span></code> — Physical models and gas properties</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">radiation/</span></code> — Radiation transport</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">radiation_laser/</span></code> — Laser radiation models</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time_integrator/</span></code> — Time integration schemes (explicit, implicit, IMEX)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sim_control/</span></code> — Simulation parameters and control</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">coupler/</span></code> — preCICE coupling interface</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">utils/</span></code> — Utility routines</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/</span></code> — Data files and tables</p></li>
+</ul>
+</section>
+<section id="multi-block-parallelization">
+<h2>Multi-Block Parallelization<a class="headerlink" href="#multi-block-parallelization" title="Link to this heading"></a></h2>
+<p>For multi-block grids, parallelization proceeds as follows:</p>
+<ol class="arabic simple">
+<li><p>At the start of a run, the global MPI communicator (<code class="docutils literal notranslate"><span class="pre">MPI_COMM_WORLD</span></code>)
+is split into a series of <code class="docutils literal notranslate"><span class="pre">block_comm</span></code> communicators using
+<code class="docutils literal notranslate"><span class="pre">MPI_Comm_split</span></code></p></li>
+<li><p>These communicators create the parallel layout of each grid block using
+PETSc DM objects (<code class="docutils literal notranslate"><span class="pre">DMDACreate3d</span></code>)</p></li>
+<li><p>During the simulation, intra-block communication is realized via PETSc
+(<code class="docutils literal notranslate"><span class="pre">DMGlobalToLocalBegin</span></code>/<code class="docutils literal notranslate"><span class="pre">End</span></code>), while inter-block communication is
+handled by the <code class="docutils literal notranslate"><span class="pre">grid_block_int</span></code> class</p></li>
+</ol>
+</section>
+<section id="coupling-architecture">
+<h2>Coupling Architecture<a class="headerlink" href="#coupling-architecture" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">coupler</span></code> class manages data exchange with other solvers via preCICE.
+It contains two child classes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">coupler_surf</span></code> — Methods for surface coupling (e.g., HEGEL ↔ PATO/CHyPS
+at the material sample surface)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">coupler_vol</span></code> — Methods for volume coupling (e.g., HEGEL ↔ FLUX for
+electromagnetic fields, HEGEL ↔ MURP for radiation transport)</p></li>
+</ul>
+</section>
+<section id="build-system">
+<h2>Build System<a class="headerlink" href="#build-system" title="Link to this heading"></a></h2>
+<p>HEGEL uses GNU Autotools (Autoconf/Automake/Libtool) as its primary
+build system. A CMake build is under development.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="numerical_schemes/input_reference.html" class="btn btn-neutral float-left" title="Input Parameter Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="development.html" class="btn btn-neutral float-right" title="Development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Alessandro Munafo, Marco Panesi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,252 @@
+.. _preconditioning:
+
+================
+Preconditioning
+================
+
+At low Mach numbers, the compressible Euler/Navier-Stokes equations become
+poorly conditioned: the ratio of the largest to smallest eigenvalues
+(:math:`|u+c|/|u|`) diverges as :math:`M \to 0`. This causes slow
+convergence for implicit solvers and excessive numerical dissipation for
+upwind flux schemes. Preconditioning rescales the eigenvalues to improve
+both.
+
+.. contents:: On this page
+   :local:
+   :depth: 2
+
+
+Available Preconditioners
+=========================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 25 60
+
+   * - Keyword
+     - Method
+     - Description
+   * - ``NONE``
+     - No preconditioning
+     - Standard compressible formulation (default)
+   * - ``WS``
+     - Weiss-Smith
+     - Low-Mach preconditioning of eigenvalues and flux dissipation
+   * - ``CM``
+     - Choi-Merkle
+     - Defined in data structures but **not implemented**
+
+**Data constants:** ``src/data/data_pc.F90``
+
+
+.. _pc-weiss-smith:
+
+Weiss-Smith Preconditioning
+============================
+
+.. admonition:: Reference
+   :class: tip
+
+   J. M. Weiss, W. A. Smith, *AIAA J.* **33**, 2050--2057 (1995).
+
+The Weiss-Smith preconditioner modifies the pseudo-time derivative by
+replacing the identity with a preconditioning matrix :math:`\Gamma^{-1}`:
+
+.. math::
+
+   \Gamma^{-1} \frac{\partial U}{\partial \tau} +
+   \frac{\partial F}{\partial x} + \frac{\partial G}{\partial y} = S
+
+The preconditioning matrix in primitive variables
+:math:`Q = (p, u, v, w, T)^T` is:
+
+.. math::
+
+   \Gamma_p = \begin{pmatrix}
+   \theta & 0 & 0 & 0 & 0 \\
+   \theta u & \rho & 0 & 0 & 0 \\
+   \theta v & 0 & \rho & 0 & 0 \\
+   \theta w & 0 & 0 & \rho & 0 \\
+   \theta H - 1 & \rho u & \rho v & \rho w & \rho c_v
+   \end{pmatrix}
+
+where the preconditioning parameter is:
+
+.. math::
+
+   \theta = \frac{1}{M_{rs}^2 c^2} + \frac{\gamma - 1}{c^2}
+
+and the reference Mach number is:
+
+.. math::
+
+   M_{rs} = \min\bigl(\max(M, \epsilon_{pc}), 1\bigr)
+
+This clamps the reference Mach number between a floor value
+:math:`\epsilon_{pc}` and 1, ensuring that preconditioning is active only at
+low Mach numbers and smoothly transitions to the unmodified system at
+:math:`M \ge 1`.
+
+**Modified eigenvalues:** Defining :math:`\alpha = \tfrac{1}{2}(1 - M_{rs}^2)`,
+the preconditioned wave speeds used in the dissipation term are:
+
+.. math::
+
+   V_n' &= (1 - \alpha)\,u_n = \tfrac{1}{2}(1 + M_{rs}^2)\,u_n \\
+   c'   &= \sqrt{\alpha^2 u_n^2 + M_{rs}^2 c^2}
+
+The preconditioned eigenvalues are :math:`|V_n' \pm c'|` for the acoustic
+waves and :math:`|u_n|` for the entropy and shear waves. As
+:math:`M \to 0`, all eigenvalues become :math:`O(u)`, eliminating the
+disparity between acoustic and convective speeds.
+
+
+Input Settings
+==============
+
+**Activation:**
+
+Preconditioning is activated by selecting a preconditioned flux scheme:
+
+.. code-block:: none
+
+   NUM_FLUX    = ROE_IPC_WS    # Inviscid Preconditioned Roe
+   FLUID_M_INF = 0.3           # Reference Mach number
+
+or:
+
+.. code-block:: none
+
+   NUM_FLUX    = ROE_VPC_WS    # Viscous Preconditioned Roe
+   FLUID_M_INF = 0.1
+
+**Key parameters:**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Keyword
+     - Description
+   * - ``FLUID_M_INF``
+     - Reference (freestream) Mach number for preconditioning scaling
+   * - ``NUM_FLUX``
+     - Must be ``ROE_IPC_WS`` or ``ROE_VPC_WS`` to activate
+
+**Source files:**
+
+- ``src/fluid_eu_ns/EU_pc.F90`` (``pc_mat``, ``WSp_pc_mat``, ``WS_pc_mat``)
+- ``src/fluid_eu_ns/EU_nflux_roe_pc.F90`` (``roe_IPC_WS_flux``, ``roe_VPC_WS_flux``)
+- ``src/fluid_eu_ns/EU_nflux_roe_utils_pc.F90`` (``roe_WS_diss_term``)
+
+**Time-step computation:** When preconditioning is active, the time step uses
+the preconditioned eigenvalues (``time_step_WS_ipc``).
+
+
+Compatibility
+=============
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Feature
+     - Compatible
+   * - Fluid models
+     - EU/NS (calorically perfect gas) **only**
+   * - LTE / NLTE
+     - **Not implemented**
+   * - ICP
+     - **Not implemented**
+   * - Flux schemes
+     - Roe (IPC/VPC variants only)
+   * - Reconstruction
+     - All procedures
+   * - Time integrators
+     - All (CFL based on preconditioned eigenvalues)
+
+.. warning::
+
+   Preconditioning is currently available **only** for the calorically perfect
+   gas (EU/NS) model with the Roe flux scheme. Multi-species or
+   multi-temperature models do not support preconditioning.
+
+
+Grid Adaptation
+===============
+
+Although not a preconditioning method, HEGEL's shock-aligned grid adaptation
+(Gnoffo-Hartung method) is another technique for improving solution quality
+and is documented here for completeness.
+
+Gnoffo-Hartung Grid Adaptation
+-------------------------------
+
+.. admonition:: Reference
+   :class: tip
+
+   P. A. Gnoffo, *AIAA Paper 83-1913* (1983).
+
+Redistributes grid points along wall-normal lines to cluster cells near the
+bow shock and in the boundary layer. Uses B-spline interpolation for smooth
+redistribution.
+
+**Input parameters:**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 15 55
+
+   * - Keyword
+     - Default
+     - Description
+   * - ``MESH_ADAPT``
+     - ``F``
+     - Enable/disable adaptation
+   * - ``MESH_ADAPT_MAX``
+     - 1
+     - Maximum number of adaptations
+   * - ``MESH_ADAPT_RATE``
+     - 1000
+     - Iterations between adaptations
+   * - ``MESH_ADAPT_START_ITER``
+     - 0
+     - First iteration to adapt
+   * - ``MESH_ADAPT_AT_RESTART``
+     - ``F``
+     - Adapt on restart
+   * - ``MESH_ADAPT_F_BL``
+     - 0.5
+     - Fraction of cells in boundary layer
+   * - ``MESH_ADAPT_F_SH``
+     - 0.9
+     - Fraction of cells in shock layer
+   * - ``MESH_ADAPT_EPS0``
+     - 6.25
+     - Clustering factor at shock
+   * - ``MESH_ADAPT_SHOCK_VAR``
+     - ``RHO``
+     - Shock detection variable (``RHO``, ``P``, ``T``)
+   * - ``MESH_ADAPT_SHOCK_VAR_RISE``
+     - 1.2
+     - Rise factor for shock detection threshold
+
+**Example:**
+
+.. code-block:: none
+
+   MESH_ADAPT              = T
+   MESH_ADAPT_MAX          = 3
+   MESH_ADAPT_RATE         = 500
+   MESH_ADAPT_F_BL         = 0.4
+   MESH_ADAPT_F_SH         = 0.85
+   MESH_ADAPT_SHOCK_VAR    = RHO
+
+**Source files:**
+
+- ``src/grid_adapt/class_grid_adapt.F90``
+- ``src/grid_adapt/grid_adapt_blunt_body_utils_shock_2d.F90`` (shock detection, 2D)
+- ``src/grid_adapt/grid_adapt_blunt_body_utils_shock_3d.F90`` (shock detection, 3D)
+- ``src/data/data_opt_mesh.F90`` (parameter definitions)
+
+**Supported geometries:** 1D, 2D, 3D blunt body configurations.

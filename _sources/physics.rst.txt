@@ -1,0 +1,139 @@
+Physics and Numerical Methods
+=============================
+
+Governing Equations
+-------------------
+
+The equations governing the dynamics of any of the fluid models available
+in HEGEL may be written in conservation law form:
+
+.. math::
+
+   \frac{\partial \mathbf{U}}{\partial t}
+   + \nabla \cdot (\mathbf{F} - \mathbf{D}) = \mathbf{S}
+
+where :math:`t` denotes time, :math:`\mathbf{U}` is the vector of conservative
+variables, :math:`\mathbf{S}` the source term vector, and :math:`\mathbf{F}` and
+:math:`\mathbf{D}` the generalized inviscid and diffusive flux vectors,
+respectively. The entries of these vectors depend on the particular fluid model
+being considered.
+
+Space Discretization
+--------------------
+
+The spatial discretization is accomplished based on the cell-centered finite
+volume (FV) method:
+
+.. math::
+
+   V_{ijk} \frac{d \hat{\mathbf{U}}_{ijk}}{dt} = \mathbf{R}_{ijk}
+
+where :math:`\hat{\mathbf{U}}_{ijk}` are the volume-averaged conservative
+variables of cell :math:`(i,j,k)` with volume :math:`V_{ijk}`. The steady
+right-hand-side residual is:
+
+.. math::
+
+   \mathbf{R}_{ijk} = V_{ijk} \mathbf{S}_{ijk}
+   - \sum_{f \in \mathcal{F}_{ijk}}
+   \left( \mathbf{H}^i_f - \mathbf{H}^d_f \right) A_f
+
+where :math:`\mathbf{H}^i_f` and :math:`\mathbf{H}^d_f` represent the inviscid
+and diffusive fluxes at face :math:`f` with area :math:`A_f`. The use of the
+mid-point rule for evaluating flux integrals makes the method second-order
+accurate for multi-dimensional grids.
+
+Inviscid Flux
+~~~~~~~~~~~~~
+
+By default, inviscid fluxes are evaluated using upwind-biased flux functions:
+
+- **Roe's approximate Riemann solver**
+- **AUSM-family methods** (AUSM+, AUSM+-up)
+
+with reconstruction procedures for high-order accuracy:
+
+- **MUSCL** (Monotone Upstream-centered Schemes for Conservation Laws)
+- **WENO** (Weighted Essentially Non-Oscillatory, up to 5th order)
+
+For turbulent and unsteady flow predictions (e.g., NLTE plasma jets), where
+upwind dissipation may lead to excessive solution smearing, HEGEL provides a
+hybrid upwind-central flux:
+
+.. math::
+
+   \mathbf{H}^i_f = \phi \, \mathbf{H}^{i(\mathrm{up})}_f
+   + (1 - \phi) \, \mathbf{H}^{i(\mathrm{c})}_f
+
+where :math:`\phi` is a dynamic sensor activated only in regions of steep
+gradients (e.g., shock waves). The central contribution is computed using the
+skew-symmetric FV schemes of Ducros et al.
+
+Slope limiters available include van Albada's limiter.
+
+Diffusive Flux
+~~~~~~~~~~~~~~
+
+Diffusive fluxes are evaluated using Green-Gauss' theorem to determine
+face-averaged gradients.
+
+Boundary Conditions
+~~~~~~~~~~~~~~~~~~~
+
+Boundary conditions are implemented using ghost or dummy cells. HEGEL
+supports:
+
+- **Extrapolation-based** boundary conditions (simple but may produce
+  spurious reflections)
+- **LODI** (Local One-Dimensional Inviscid) non-reflecting boundary conditions,
+  following the ghost-cell formulation of Motheau et al. These minimize
+  reflections at boundaries and are critical for unsteady simulations
+
+Additional boundary condition types include isothermal walls, prescribed
+inflow/outflow, and periodic boundaries.
+
+Time Integration
+----------------
+
+The semi-discrete system of ODEs may be advanced in time using:
+
+**Explicit methods**
+   - 3rd-order Strong Stability Preserving (SSP) Runge-Kutta
+   - 4th-order classical Runge-Kutta
+
+**Implicit methods**
+   - Backward Euler with Data-Parallel Line Relaxation (DPLR), yielding
+     block-tridiagonal systems solved along each mesh radial line
+   - Convergence to steady-state accelerated via local time-stepping
+
+**Implicit-Explicit (IMEX) methods**
+   For problems with stiff source terms (e.g., chemical kinetics) combined
+   with non-stiff convective terms.
+
+Grid System
+-----------
+
+HEGEL uses point-matched block-structured grids to treat complex geometries
+while retaining the efficiency and simplicity of structured grid solvers.
+
+For multi-block grids, parallelization is implemented by splitting the global
+MPI communicator into block communicators using ``MPI_Comm_split``. These
+communicators are then used to create the parallel layout of each grid block
+using PETSc DM objects. Intra-block communication is handled by PETSc
+(``DMGlobalToLocalBegin``/``End``), while inter-block communication is managed
+by the ``grid_block_int`` class.
+
+Grid adaptation following the procedure of Gnoffo and Hartung is available
+for shock-aligned refinement in blunt body simulations.
+
+Solution Strategy for Steady-State Problems
+-------------------------------------------
+
+A typical two-step approach for obtaining second-order accurate steady-state
+solutions:
+
+1. Compute a first-order solution using a diffusive flux (e.g., van Leer's
+   flux vector splitting) with backward Euler and local time-stepping
+2. Restart with the second-order scheme (AUSM+ with MUSCL reconstruction
+   and van Albada limiter), applying grid adaptation to prevent oscillations
+   around the shock

@@ -1,0 +1,128 @@
+Getting Started
+===============
+
+Prerequisites
+-------------
+
+Required Packages
+~~~~~~~~~~~~~~~~~
+
+- Fortran, C, and C++ compilers (GCC or Intel oneAPI)
+- MPI (OpenMPI, Intel MPI, or MPICH)
+- `PETSc <https://petsc.org>`_ (with fblaslapack, METIS, and ParMETIS)
+- GNU Autotools: `Autoconf <https://www.gnu.org/software/autoconf/>`_,
+  `Automake <https://www.gnu.org/software/automake/>`_, and
+  `Libtool <https://www.gnu.org/software/libtool/>`_
+
+Optional Dependencies
+~~~~~~~~~~~~~~~~~~~~~
+
+- `CGNS <https://github.com/CGNS>`_ — CFD General Notation System for mesh/solution I/O
+- `tecIO <https://www.tecplot.com/products/tecio-library/>`_ — Tecplot binary file output
+- `PLATO <https://hermes-aerospace.github.io/plato-docs/>`_ — Thermochemistry library for NLTE flows
+- `preCICE <https://precice.org/>`_ — Multi-physics coupling library
+- `SUNDIALS/CVODE <https://computing.llnl.gov/projects/sundials/cvode>`_ — Stiff ODE solver
+
+Building PETSc
+~~~~~~~~~~~~~~
+
+PETSc is the primary required dependency. A minimal build for use with HEGEL:
+
+.. code-block:: bash
+
+   cd petsc
+   ./configure FC=mpif90 CC=mpicc CXX=mpicxx \
+       --download-fblaslapack \
+       --download-metis \
+       --download-parmetis \
+       --with-debugging=0 \
+       COPTFLAGS='-O3 -mtune=native' \
+       --prefix=$PETSC_DIR
+   make
+   make install
+
+The ``fblaslapack``, ``metis``, and ``parmetis`` libraries are required.
+You can have PETSc download them (as shown), point to local installations
+(e.g., ``--with-parmetis=$PARMETIS_DIR``), or provide tarballs.
+
+Building HEGEL with Autotools
+-----------------------------
+
+Step 1: Bootstrap
+~~~~~~~~~~~~~~~~~
+
+Run the Autotools suite (only needed once, or when ``configure.ac`` / ``Makefile.am`` files change):
+
+.. code-block:: bash
+
+   cd hegel
+   ./autogen.sh
+
+Step 2: Configure
+~~~~~~~~~~~~~~~~~
+
+Configure the build. For example, to build in debug mode with the Euler/Navier-Stokes model:
+
+.. code-block:: bash
+
+   ./configure FC=mpif90 CC=mpicc CXX=mpicxx \
+       --enable-debug \
+       --enable-euns=yes \
+       --enable-euns_nlte=no \
+       --enable-euns_lte=no \
+       --enable-icp_lte=no \
+       --enable-icp_nlte=no \
+       --with-petsc=$PETSC_DIR \
+       --prefix=$HEGEL_DIR
+
+For an optimized build with NLTE support and optional libraries:
+
+.. code-block:: bash
+
+   ./configure FC=mpif90 CC=mpicc CXX=mpicxx \
+       --enable-euns=yes \
+       --enable-euns_nlte=yes \
+       --with-petsc=$PETSC_DIR \
+       --with-plato=$PLATO_DIR \
+       --with-cgns=$CGNS_DIR \
+       --with-tecio=$TECIO_DIR \
+       --prefix=$HEGEL_DIR
+
+Run ``./configure --help`` for the full list of options.
+
+Step 3: Build and Install
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   make
+   make install
+
+The HEGEL executable will be placed in ``$HEGEL_DIR/bin``.
+
+Step 4: Environment Setup
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Add HEGEL to your path:
+
+.. code-block:: bash
+
+   export PATH=$HEGEL_DIR/bin:$PATH
+
+Or use environment modules (recommended).
+
+To rebuild from scratch without changing options, use ``make clean``.
+To change configuration options, run ``make distclean`` first.
+
+Running a Case
+--------------
+
+Pass an input file to the HEGEL executable:
+
+.. code-block:: bash
+
+   # Serial
+   hegel input/testcases/EU_NS/1D/EU_1D_Sod_ShockTube
+
+   # Parallel (4 processors)
+   mpirun -np 4 hegel input/testcases/EU_NS/1D/EU_1D_Sod_ShockTube
